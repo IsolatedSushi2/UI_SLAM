@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1000</width>
-    <height>588</height>
+    <width>1735</width>
+    <height>761</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -633,6 +633,21 @@ QPushButton:pressed {
             </widget>
             <widget class="QWidget" name="videoPage">
              <layout class="QHBoxLayout" name="horizontalLayout_7">
+              <property name="spacing">
+               <number>10</number>
+              </property>
+              <property name="leftMargin">
+               <number>0</number>
+              </property>
+              <property name="topMargin">
+               <number>0</number>
+              </property>
+              <property name="rightMargin">
+               <number>0</number>
+              </property>
+              <property name="bottomMargin">
+               <number>0</number>
+              </property>
               <item>
                <widget class="QFrame" name="frame_2">
                 <property name="frameShape">
@@ -642,12 +657,27 @@ QPushButton:pressed {
                  <enum>QFrame::Raised</enum>
                 </property>
                 <layout class="QHBoxLayout" name="horizontalLayout_10">
+                 <property name="spacing">
+                  <number>10</number>
+                 </property>
+                 <property name="leftMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="topMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="rightMargin">
+                  <number>0</number>
+                 </property>
+                 <property name="bottomMargin">
+                  <number>0</number>
+                 </property>
                  <item>
                   <widget class="QLabel" name="rgbImage">
                    <property name="minimumSize">
                     <size>
-                     <width>320</width>
-                     <height>240</height>
+                     <width>640</width>
+                     <height>480</height>
                     </size>
                    </property>
                    <property name="maximumSize">
@@ -664,6 +694,9 @@ QPushButton:pressed {
                    <property name="text">
                     <string>RGB Image</string>
                    </property>
+                   <property name="scaledContents">
+                    <bool>true</bool>
+                   </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
                    </property>
@@ -673,8 +706,8 @@ QPushButton:pressed {
                   <widget class="QLabel" name="depthImage">
                    <property name="minimumSize">
                     <size>
-                     <width>320</width>
-                     <height>240</height>
+                     <width>640</width>
+                     <height>480</height>
                     </size>
                    </property>
                    <property name="maximumSize">
@@ -690,6 +723,9 @@ QPushButton:pressed {
                    </property>
                    <property name="text">
                     <string>Depth Image</string>
+                   </property>
+                   <property name="scaledContents">
+                    <bool>true</bool>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>

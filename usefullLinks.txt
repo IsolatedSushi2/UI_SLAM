@@ -1,0 +1,3 @@
+
+Information regarding pointClouds
+https://stackoverflow.com/questions/41241236/vectorizing-the-kinect-real-world-coordinate-processing-algorithm-for-speed

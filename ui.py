@@ -14,7 +14,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1000, 588)
+        MainWindow.resize(1735, 773)
         MainWindow.setStyleSheet("background-color: rgb(33, 37, 43);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setStyleSheet("background: transparent;\n"
@@ -268,28 +268,34 @@ class Ui_MainWindow(object):
         self.videoPage = QtWidgets.QWidget()
         self.videoPage.setObjectName("videoPage")
         self.horizontalLayout_7 = QtWidgets.QHBoxLayout(self.videoPage)
+        self.horizontalLayout_7.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_7.setSpacing(10)
         self.horizontalLayout_7.setObjectName("horizontalLayout_7")
         self.frame_2 = QtWidgets.QFrame(self.videoPage)
         self.frame_2.setFrameShape(QtWidgets.QFrame.StyledPanel)
         self.frame_2.setFrameShadow(QtWidgets.QFrame.Raised)
         self.frame_2.setObjectName("frame_2")
         self.horizontalLayout_10 = QtWidgets.QHBoxLayout(self.frame_2)
+        self.horizontalLayout_10.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_10.setSpacing(10)
         self.horizontalLayout_10.setObjectName("horizontalLayout_10")
         self.rgbImage = QtWidgets.QLabel(self.frame_2)
-        self.rgbImage.setMinimumSize(QtCore.QSize(320, 240))
+        self.rgbImage.setMinimumSize(QtCore.QSize(640, 480))
         self.rgbImage.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setPointSize(33)
         self.rgbImage.setFont(font)
+        self.rgbImage.setScaledContents(True)
         self.rgbImage.setAlignment(QtCore.Qt.AlignCenter)
         self.rgbImage.setObjectName("rgbImage")
         self.horizontalLayout_10.addWidget(self.rgbImage)
         self.depthImage = QtWidgets.QLabel(self.frame_2)
-        self.depthImage.setMinimumSize(QtCore.QSize(320, 240))
+        self.depthImage.setMinimumSize(QtCore.QSize(640, 480))
         self.depthImage.setMaximumSize(QtCore.QSize(16777215, 16777215))
         font = QtGui.QFont()
         font.setPointSize(33)
         self.depthImage.setFont(font)
+        self.depthImage.setScaledContents(True)
         self.depthImage.setAlignment(QtCore.Qt.AlignCenter)
         self.depthImage.setObjectName("depthImage")
         self.horizontalLayout_10.addWidget(self.depthImage)
@@ -369,3 +375,12 @@ class Ui_MainWindow(object):
         self.versionLabel.setText(_translate("MainWindow", "v1.0.0"))
 import qtresources_rc
 
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    MainWindow = QtWidgets.QMainWindow()
+    ui = Ui_MainWindow()
+    ui.setupUi(MainWindow)
+    MainWindow.show()
+    sys.exit(app.exec_())

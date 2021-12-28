@@ -1,3 +1,9 @@
 
 Information regarding pointClouds
 https://stackoverflow.com/questions/41241236/vectorizing-the-kinect-real-world-coordinate-processing-algorithm-for-speed
+
+Datasets
+https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg1_xyz
+
+pointCloud
+https://files.gitter.im/vispy/vispy/eVM2/image.png

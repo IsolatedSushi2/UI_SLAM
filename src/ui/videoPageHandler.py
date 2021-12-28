@@ -10,7 +10,7 @@ class VideoPageHandler:
 
         self.currentFrameIndex = 0
 
-        #Update Timer for the video
+        # Update Timer for the video
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateFrame)
         self.timer.start(1000 // 30)

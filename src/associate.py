@@ -70,7 +70,7 @@ def read_file_list(filename):
     list = [(float(l[0]),l[1:]) for l in list if len(l)>1]
     return dict(list)
 
-def associate(first_list, second_list,offset = 0.0,max_difference = 0.02):
+def associate(first_list, second_list,offset = 0.0,max_difference = 1):
     """
     Associate two dictionaries of (stamp,data). As the time stamps never match exactly, we aim 
     to find the closest match for every input tuple.

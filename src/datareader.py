@@ -98,7 +98,7 @@ class DataReader:
 
         for currTimeStamp in activeTimeStamps:
             currFileName = fileNames[currTimeStamp]
-            currImage = Image.open(os.path.join(path, currFileName))
+            currImage = np.array(Image.open(os.path.join(path, currFileName)))
 
             
             returnDict[currTimeStamp] = currImage

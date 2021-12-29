@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtGui import QPixmap, QImage
 import cv2
 import numpy as np
+from src.constants import VIDEO_PAGE_INDEX
+
 
 class VideoPageHandler:
     def __init__(self, ui, dataObject):
@@ -14,23 +16,29 @@ class VideoPageHandler:
         # Update Timer for the video
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateFrame)
-        self.timer.start(1000 // 60)
+        self.timer.start(1000 // 30)
 
+    # Go trough the images
     def updateFrame(self):
+
+        # Disable when not using the page (less computation and avoids the vispy memory leak bug)
+        if self.ui.mainStackedWidget.currentIndex() != VIDEO_PAGE_INDEX:
+            return
+        
         currTimestamp = self.data.timestamps[self.currentFrameIndex]
         currRGBImage = self.data.rgbImages[currTimestamp]
         currDepthImage = self.data.depthImages[currTimestamp]
         
-        currPixMap = self.cv2ToQPixmap(currRGBImage,QImage.Format_RGB888)
-        self.ui.rgbImage.setPixmap(currPixMap)
+        currRGBPixMap = self.cv2ToQPixmap(currRGBImage, QImage.Format_RGB888)
+        currDepthPixMap = self.cv2ToQPixmap(np.array(currDepthImage, dtype=np.uint16), QImage.Format_Grayscale16) # Specify 
 
-        currPixMap = self.cv2ToQPixmap(currDepthImage,QImage.Format_RGB16)
-        self.ui.depthImage.setPixmap(currPixMap)
+        self.ui.rgbImage.setPixmap(currRGBPixMap)
+        self.ui.depthImage.setPixmap(currDepthPixMap)
 
+        # Update frame
         self.currentFrameIndex = (self.currentFrameIndex + 1) % len(self.data.timestamps)
 
+    # For translating numpy array to Pil image (don't want to keep everything in memory)
     def cv2ToQPixmap(self, currImage, imageFormat):
         height, width = (currImage.shape[0], currImage.shape[1])
-        
-        #bytesPerLine = {QImage.Format_RGB888:3, QImage.Format_Grayscale16:2}[imageFormat] * width
         return QPixmap.fromImage(QImage(currImage, width, height, imageFormat))

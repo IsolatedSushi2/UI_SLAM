@@ -5,7 +5,7 @@ import os
 import numpy as np
 import cv2
 from PIL import Image
-
+from src.constants import MAX_DATA_POINT_AMOUNT
 from src.associate import read_file_list, associate
 
 
@@ -38,29 +38,45 @@ class Data:
 
 class DataReader:
 
-    @staticmethod
+    # Load in all data (according to the TUM dataset format)
+    @staticmethod 
     def loadDirectory(path):
         dataObject = Data()
+        # Get initial timestamps (will shrink due to the matching)
+        timestamps = DataReader.getTimeStamps(os.path.join(path, "rgb.txt"))
+        initialAmount = len(timestamps)
 
-        dataObject.timestamps = DataReader.getTimeStamps(os.path.join(path, "rgb.txt"))
-        dataObject.rgbFileNames = DataReader.getFileNames(os.path.join(path, "rgb.txt"))
-        dataObject.groundTruth = DataReader().getGroundTruth(os.path.join(path, "groundtruth.txt"), dataObject.rgbFileNames)
-        dataObject.depthFileNames = DataReader.getFileNames(os.path.join(path, "depth.txt"), dataObject.rgbFileNames)
-        dataObject.rgbImages = DataReader().getImages(path, dataObject.timestamps, dataObject.rgbFileNames)
-        dataObject.depthImages = DataReader().getImages(path, dataObject.timestamps, dataObject.depthFileNames, True)
+        # Get the first n datapoints (useful when dealing with huge dataset)
+        if MAX_DATA_POINT_AMOUNT > 1:
+            timestamps = timestamps[:MAX_DATA_POINT_AMOUNT]
+        
+        # Get, and match the filenames from the rgb and depth files
+        dataObject.rgbFileNames, timestamps = DataReader.getFileNames(os.path.join(path, "rgb.txt"), timestamps)
+        dataObject.depthFileNames, timestamps = DataReader.getFileNames(os.path.join(path, "depth.txt"), timestamps)
+
+        # Get, and match the groundTruth
+        dataObject.groundTruth, timestamps = DataReader().getGroundTruth(os.path.join(path, "groundtruth.txt"), timestamps)
+
+        # Get the images from the matched timestamps
+        dataObject.rgbImages = DataReader().getImages(path, timestamps, dataObject.rgbFileNames, np.uint8)
+        dataObject.depthImages = DataReader().getImages(path, timestamps, dataObject.depthFileNames, np.uint16)
+
+        #Get the final amount of stamps
+        dataObject.timestamps = timestamps
+        print("From", initialAmount, "there are", len(timestamps), "timestamps remaining! (Max datapoint amount parameter is", MAX_DATA_POINT_AMOUNT, ")")
 
         return dataObject
 
+    # Have to match the timestamps from the different images manually TODO fix when a match cannot be found
     @staticmethod
-    def matchTimeStamps(rgbDict, matchDict):
-        matches = associate(rgbDict, matchDict)       
-        returnDict = dict([(rgbKey, matchDict[matchKey]) for rgbKey, matchKey in matches])
+    def matchTimeStamps(timestamps, matchDict):
+        matches = associate(timestamps, matchDict)       
+        returnDict = dict([(timestamp, matchDict[matchKey]) for timestamp, matchKey in matches])
 
-        assert len(returnDict.keys()) == len(rgbDict.keys()), "Error with matching timestamps"
-        return returnDict
+        # assert len(returnDict.keys()) == len(rgbDict.keys()), "Error with matching timestamps {} {}".format(len(returnDict.keys()), len(rgbDict.keys()))
+        return returnDict, list(returnDict.keys())
 
-
-
+    # Get all the timestamps
     @staticmethod
     def getTimeStamps(path):
         with open(path) as file:
@@ -71,18 +87,17 @@ class DataReader:
 
         return timestamps
     
+    # Get all the image filenames from the timestamps
     @staticmethod
-    def getFileNames(path, rgbDict = None):
+    def getFileNames(path, timestamps):
         with open(path) as file:
             lines = [line.strip() for line in file if not line.startswith("#")]
 
         splitLines = [(float(line.split(' ')[0]), line.split(' ')[1]) for line in lines]
         
-        if rgbDict:
-            return DataReader().matchTimeStamps(rgbDict, dict(splitLines))
+        return DataReader().matchTimeStamps(timestamps, dict(splitLines))
 
-        return dict(splitLines)
-
+    # Get the ground truth according to the actual sensor data from the TUM dataset
     @staticmethod
     def getGroundTruth(path, rgbDict):
         with open(path) as file:
@@ -92,15 +107,14 @@ class DataReader:
         
         return DataReader().matchTimeStamps(rgbDict, dict(groundTruths))
 
+    # Get the rgb and depth images, note that the rgb is 24 (8-8-8) bits, whilst depth is 16bit
     @staticmethod
-    def getImages(path, activeTimeStamps, fileNames, depth=False):
+    def getImages(path, activeTimeStamps, fileNames, dtype):
         returnDict = {}
 
         for currTimeStamp in activeTimeStamps:
             currFileName = fileNames[currTimeStamp]
-            currImage = np.array(Image.open(os.path.join(path, currFileName)))
-
-            
+            currImage = np.array(Image.open(os.path.join(path, currFileName)), dtype=dtype)            
             returnDict[currTimeStamp] = currImage
 
         return returnDict

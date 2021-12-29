@@ -69,6 +69,29 @@ class Ui_MainWindow(object):
         self.uploadDefaultDatasetButton.setIconSize(QtCore.QSize(24, 24))
         self.uploadDefaultDatasetButton.setObjectName("uploadDefaultDatasetButton")
         self.verticalLayout_4.addWidget(self.uploadDefaultDatasetButton)
+        self.uploadDatasetButton = QtWidgets.QPushButton(self.leftButtonsFrame)
+        self.uploadDatasetButton.setMinimumSize(QtCore.QSize(60, 60))
+        self.uploadDatasetButton.setMaximumSize(QtCore.QSize(60, 60))
+        self.uploadDatasetButton.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.uploadDatasetButton.setStyleSheet("QPushButton {\n"
+"    background-position: center;\n"
+"    background-repeat: no-reperat;\n"
+"    border: none;\n"
+"    background-color: rgb(27, 29, 35);\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(33, 37, 43);\n"
+"}\n"
+"QPushButton:pressed {    \n"
+"    background-color: rgb(85, 170, 255);\n"
+"}")
+        self.uploadDatasetButton.setText("")
+        icon1 = QtGui.QIcon()
+        icon1.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-folder-open.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.uploadDatasetButton.setIcon(icon1)
+        self.uploadDatasetButton.setIconSize(QtCore.QSize(24, 24))
+        self.uploadDatasetButton.setObjectName("uploadDatasetButton")
+        self.verticalLayout_4.addWidget(self.uploadDatasetButton)
         self.videoButton = QtWidgets.QPushButton(self.leftButtonsFrame)
         self.videoButton.setMinimumSize(QtCore.QSize(60, 60))
         self.videoButton.setMaximumSize(QtCore.QSize(60, 60))
@@ -86,9 +109,9 @@ class Ui_MainWindow(object):
 "    background-color: rgb(85, 170, 255);\n"
 "}")
         self.videoButton.setText("")
-        icon1 = QtGui.QIcon()
-        icon1.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-video.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.videoButton.setIcon(icon1)
+        icon2 = QtGui.QIcon()
+        icon2.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-video.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.videoButton.setIcon(icon2)
         self.videoButton.setIconSize(QtCore.QSize(24, 24))
         self.videoButton.setObjectName("videoButton")
         self.verticalLayout_4.addWidget(self.videoButton)
@@ -109,9 +132,9 @@ class Ui_MainWindow(object):
 "    background-color: rgb(85, 170, 255);\n"
 "}")
         self.pointCloudButton.setText("")
-        icon2 = QtGui.QIcon()
-        icon2.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-3d.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.pointCloudButton.setIcon(icon2)
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-3d.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.pointCloudButton.setIcon(icon3)
         self.pointCloudButton.setIconSize(QtCore.QSize(24, 24))
         self.pointCloudButton.setObjectName("pointCloudButton")
         self.verticalLayout_4.addWidget(self.pointCloudButton)
@@ -132,35 +155,12 @@ class Ui_MainWindow(object):
 "    background-color: rgb(85, 170, 255);\n"
 "}")
         self.camera3dButton.setText("")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-camera.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.camera3dButton.setIcon(icon3)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-camera.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.camera3dButton.setIcon(icon4)
         self.camera3dButton.setIconSize(QtCore.QSize(24, 24))
         self.camera3dButton.setObjectName("camera3dButton")
         self.verticalLayout_4.addWidget(self.camera3dButton)
-        self.uploadDatasetButton = QtWidgets.QPushButton(self.leftButtonsFrame)
-        self.uploadDatasetButton.setMinimumSize(QtCore.QSize(60, 60))
-        self.uploadDatasetButton.setMaximumSize(QtCore.QSize(60, 60))
-        self.uploadDatasetButton.setLayoutDirection(QtCore.Qt.LeftToRight)
-        self.uploadDatasetButton.setStyleSheet("QPushButton {\n"
-"    background-position: center;\n"
-"    background-repeat: no-reperat;\n"
-"    border: none;\n"
-"    background-color: rgb(27, 29, 35);\n"
-"}\n"
-"QPushButton:hover {\n"
-"    background-color: rgb(33, 37, 43);\n"
-"}\n"
-"QPushButton:pressed {    \n"
-"    background-color: rgb(85, 170, 255);\n"
-"}")
-        self.uploadDatasetButton.setText("")
-        icon4 = QtGui.QIcon()
-        icon4.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-folder-open.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.uploadDatasetButton.setIcon(icon4)
-        self.uploadDatasetButton.setIconSize(QtCore.QSize(24, 24))
-        self.uploadDatasetButton.setObjectName("uploadDatasetButton")
-        self.verticalLayout_4.addWidget(self.uploadDatasetButton)
         spacerItem = QtWidgets.QSpacerItem(20, 40, QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Expanding)
         self.verticalLayout_4.addItem(spacerItem)
         self.nameLogoFrame = QtWidgets.QFrame(self.leftButtonsFrame)

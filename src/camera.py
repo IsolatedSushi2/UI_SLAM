@@ -1,14 +1,15 @@
 import numpy as np
 
 class CameraParameters:
-    def __init__(self, width, height, focalx, focaly, centerx, centery):
+    def __init__(self, width, height, focalx, focaly, centerx, centery, depthScalingFactor):
         self.focalx = focalx
         self.focaly = focaly
         self.centerx = centerx
         self.centery = centery
         self.width = width
         self.height = height
-
+        self.depthScalingFactor = depthScalingFactor
+        
         self.K = self.getKMatrix()
         print("Camera Matrix:\n", self.K)
 

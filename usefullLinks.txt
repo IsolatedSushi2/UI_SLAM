@@ -10,3 +10,6 @@ https://files.gitter.im/vispy/vispy/eVM2/image.png
 
 SLAM
 https://wiki.ros.org/rgbdslam_electric/evaluation
+
+Custom VISPY Camera
+https://github.com/vispy/vispy/issues/1873

@@ -4,6 +4,7 @@
 import os
 import numpy as np
 import cv2
+from PIL import Image
 
 from src.associate import read_file_list, associate
 
@@ -97,9 +98,9 @@ class DataReader:
 
         for currTimeStamp in activeTimeStamps:
             currFileName = fileNames[currTimeStamp]
-            currImage = cv2.imread(os.path.join(path, currFileName))
+            currImage = Image.open(os.path.join(path, currFileName))
 
             
-            returnDict[currTimeStamp] = cv2.cvtColor(currImage, cv2.COLOR_BGR2RGB) 
+            returnDict[currTimeStamp] = currImage
 
         return returnDict

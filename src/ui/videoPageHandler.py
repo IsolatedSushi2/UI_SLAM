@@ -16,6 +16,7 @@ class VideoPageHandler:
         self.timer.start(1000 // 30)
 
     def updateFrame(self):
+        return
         currTimestamp = self.data.timestamps[self.currentFrameIndex]
         currRGBImage = self.data.rgbImages[currTimestamp]
         currDepthImage = self.data.depthImages[currTimestamp]

@@ -42,6 +42,7 @@ class SLAM:
         self.data = DataReader().loadDirectory(path)
 
         print("Loaded in all data")
+        self.ui.notificationLabel.setText("Loaded dataset: {}".format(path))
 
         self.videoPageHandler = VideoPageHandler(self.ui, self.data)
         self.pointCloudPageHandler = PointCloudPageHandler(self.ui, self.data, DEFAULT_CAMERA_PARAMETERS)

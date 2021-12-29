@@ -3,6 +3,8 @@ from vispy import scene
 from vispy.scene import visuals
 from colour import Color
 from pyquaternion import Quaternion
+from src.ui.rangeslider import QRangeSlider
+from PyQt5 import QtCore, QtGui, QtWidgets
 
 class CameraPageHandler:
     def __init__(self, ui, dataObject):
@@ -11,9 +13,38 @@ class CameraPageHandler:
 
         self.currentFrameIndex = 0
 
-        self.createWidget()
+        self.createVispyWidget()
+
         self.addSceneVisuals()
+
+        self.cameras, self.directions = self.getRenders()
+        self.createRangeSliderWidget()
+
         self.setSceneVisualsData()
+
+
+
+    # Create the 3d vispy widget
+    def createVispyWidget(self):
+        self.canvas = scene.SceneCanvas(keys='interactive', size=(600, 600), show=True, bgcolor='black')
+        self.ui.camera3dPage.layout().addWidget(self.canvas.native)
+
+        self.view = self.canvas.central_widget.add_view()
+
+        self.view.camera = 'turntable'  # scene.cameras.FlyCamera()  # or try 'arcball'
+
+    def createRangeSliderWidget(self):
+        self.rangeSlider = QRangeSlider()
+
+        self.rangeSlider.setMaximumHeight(20)
+        self.rangeSlider.setMax(len(self.cameras))
+        self.rangeSlider.setEnd(len(self.cameras))
+        
+        self.rangeSlider.startValueChanged.connect(self.setSceneVisualsData)
+        self.rangeSlider.endValueChanged.connect(self.setSceneVisualsData)
+
+        self.ui.camera3dPage.layout().addWidget(self.rangeSlider)
+
 
     # Get the camera location, including its translation and rotation
     def getRenders(self):        
@@ -43,15 +74,6 @@ class CameraPageHandler:
 
         return np.asarray([color.rgb for color in colors])
 
-    # Create the 3d vispy widget
-    def createWidget(self):
-        self.canvas = scene.SceneCanvas(keys='interactive', size=(600, 600), show=True, bgcolor='black')
-        self.ui.camera3dPage.layout().addWidget(self.canvas.native)
-
-        self.view = self.canvas.central_widget.add_view()
-
-        self.view.camera = 'turntable'  # scene.cameras.FlyCamera()  # or try 'arcball'
-
     def addSceneVisuals(self):
         # For the camera positions
         self.scatter = visuals.Markers()
@@ -66,11 +88,13 @@ class CameraPageHandler:
         self.axis = visuals.XYZAxis(parent=self.view.scene)
     
     def setSceneVisualsData(self):
-        cameras, lines = self.getRenders()        
-        colors = self.getColours(len(cameras))
+        currCameras = self.cameras[self.rangeSlider.start(): self.rangeSlider.end()]
+        currDirections = self.directions[self.rangeSlider.start() * 2: self.rangeSlider.end() * 2]
 
-        self.scatter.set_data(cameras, edge_color=None, face_color=colors, size=10, scaling=False)
-        self.lines.set_data(pos=lines, color=np.repeat(colors, 2, axis=0), connect="segments")
+        self.colors = self.getColours(len(currCameras))
+
+        self.scatter.set_data(currCameras, edge_color=None, face_color=self.colors, size=10, scaling=False)
+        self.lines.set_data(pos=currDirections, color=np.repeat(self.colors, 2, axis=0), connect="segments")
 
         
 

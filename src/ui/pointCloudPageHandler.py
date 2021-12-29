@@ -25,7 +25,9 @@ class PointCloudPageHandler:
         # Update Timer for the video
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateFrame)
-        self.timer.start(5000)
+        self.timer.start(10)
+
+        self.count=0
 
     def setupWidget(self):
         self.canvas = scene.SceneCanvas(
@@ -45,6 +47,36 @@ class PointCloudPageHandler:
         # add a colored 3D axis for orientation
         self.axis = visuals.XYZAxis(parent=self.view.scene)
 
+
+    def generate_pointcloud2(self, timestamp, rotationMatrix):
+        print("Generating")
+        focalLength = 525.0
+        centerX = 319.5
+        centerY = 239.5
+        scalingFactor = 5000.0
+
+        rgb = np.array(self.data.rgbImages[timestamp])
+        depth = np.array(self.data.depthImages[timestamp])
+
+        depthMask = depth != 0
+        
+        width, height = depth.shape
+
+       
+        colors = rgb[depthMask] / 255
+        depth = depth[depthMask]
+
+        Z = depth / scalingFactor
+        u = np.tile(np.arange(width),(height,1)).T[depthMask]
+        v = np.tile(np.arange(height),(width,1))[depthMask]
+        X = np.multiply(v - centerX, Z / focalLength)
+        Y = np.multiply(u - centerY, Z / focalLength)
+
+        positions = np.column_stack((X,Y,Z))
+
+        return rotationMatrix.dot(positions.T).T + self.data.groundTruth[timestamp].translation , colors
+
+
     def generate_pointcloud(self, timestamp, rotationMatrix):
         print("Generating")
         focalLength = 525.0
@@ -56,6 +88,9 @@ class PointCloudPageHandler:
         depth = self.data.depthImages[timestamp]
         points = []
         colors = []
+
+
+
         for v in range(rgb.size[1]):
             for u in range(rgb.size[0]):
                 color = rgb.getpixel((u,v))
@@ -65,11 +100,23 @@ class PointCloudPageHandler:
                 Y = (v - centerY) * Z / focalLength
                 points.append(np.array([X,Y,Z]))
                 colors.append(np.array(color))
-        print("Finished generating")
+
+
+        rgb = np.array(rgb)
+        print(rgb.shape)
+        row,column,_ = rgb.shape
+        rgb.reshape((row*column,3))
+
 
         return rotationMatrix.dot(np.array(points).T).T + self.data.groundTruth[timestamp].translation, np.array(colors) / 255
 
     def updateFrame(self):
+        
+        if self.count == 10:
+            return
+        self.count+=1
+
+
         gc.collect()
         print("Collect")
 
@@ -81,8 +128,7 @@ class PointCloudPageHandler:
 
         x, y, z, w = tuple(self.data.groundTruth[currTimestamp].quaternion)
         quaternion = Quaternion(x=x, y=y, z=z,w=w)
-        pos, colors = self.generate_pointcloud(currTimestamp, quaternion.rotation_matrix)
-        print(colors[0])
+        pos, colors = self.generate_pointcloud2(currTimestamp, quaternion.rotation_matrix)
 
         self.allPos = np.concatenate((self.allPos, pos))
         self.allColors =np.concatenate((self.allColors, colors))
@@ -92,7 +138,7 @@ class PointCloudPageHandler:
         #print(pos.shape)
         #self.scatter.update()
         self.scatter.set_data(pos = self.allPos, edge_width=0, face_color=self.allColors, size=1, scaling=False)
-        self.currentFrameIndex = (self.currentFrameIndex + 10) % len(self.data.timestamps)
+        self.currentFrameIndex = (self.currentFrameIndex + 20) % len(self.data.timestamps)
 
 
 

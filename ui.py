@@ -115,6 +115,29 @@ class Ui_MainWindow(object):
         self.pointCloudButton.setIconSize(QtCore.QSize(24, 24))
         self.pointCloudButton.setObjectName("pointCloudButton")
         self.verticalLayout_4.addWidget(self.pointCloudButton)
+        self.camera3dButton = QtWidgets.QPushButton(self.leftButtonsFrame)
+        self.camera3dButton.setMinimumSize(QtCore.QSize(60, 60))
+        self.camera3dButton.setMaximumSize(QtCore.QSize(60, 60))
+        self.camera3dButton.setLayoutDirection(QtCore.Qt.LeftToRight)
+        self.camera3dButton.setStyleSheet("QPushButton {\n"
+"    background-position: center;\n"
+"    background-repeat: no-reperat;\n"
+"    border: none;\n"
+"    background-color: rgb(27, 29, 35);\n"
+"}\n"
+"QPushButton:hover {\n"
+"    background-color: rgb(33, 37, 43);\n"
+"}\n"
+"QPushButton:pressed {    \n"
+"    background-color: rgb(85, 170, 255);\n"
+"}")
+        self.camera3dButton.setText("")
+        icon3 = QtGui.QIcon()
+        icon3.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-camera.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.camera3dButton.setIcon(icon3)
+        self.camera3dButton.setIconSize(QtCore.QSize(24, 24))
+        self.camera3dButton.setObjectName("camera3dButton")
+        self.verticalLayout_4.addWidget(self.camera3dButton)
         self.uploadDatasetButton = QtWidgets.QPushButton(self.leftButtonsFrame)
         self.uploadDatasetButton.setMinimumSize(QtCore.QSize(60, 60))
         self.uploadDatasetButton.setMaximumSize(QtCore.QSize(60, 60))
@@ -132,9 +155,9 @@ class Ui_MainWindow(object):
 "    background-color: rgb(85, 170, 255);\n"
 "}")
         self.uploadDatasetButton.setText("")
-        icon3 = QtGui.QIcon()
-        icon3.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-folder-open.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
-        self.uploadDatasetButton.setIcon(icon3)
+        icon4 = QtGui.QIcon()
+        icon4.addPixmap(QtGui.QPixmap(":/icons/24x24/cil-folder-open.png"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        self.uploadDatasetButton.setIcon(icon4)
         self.uploadDatasetButton.setIconSize(QtCore.QSize(24, 24))
         self.uploadDatasetButton.setObjectName("uploadDatasetButton")
         self.verticalLayout_4.addWidget(self.uploadDatasetButton)
@@ -308,6 +331,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_8.setSpacing(0)
         self.horizontalLayout_8.setObjectName("horizontalLayout_8")
         self.mainStackedWidget.addWidget(self.pointCloudPage)
+        self.camera3dPage = QtWidgets.QWidget()
+        self.camera3dPage.setObjectName("camera3dPage")
+        self.verticalLayout_5 = QtWidgets.QVBoxLayout(self.camera3dPage)
+        self.verticalLayout_5.setObjectName("verticalLayout_5")
+        self.mainStackedWidget.addWidget(self.camera3dPage)
         self.verticalLayout_3.addWidget(self.mainStackedWidget)
         self.informationBar = QtWidgets.QFrame(self.centerFrame)
         self.informationBar.setMinimumSize(QtCore.QSize(0, 20))

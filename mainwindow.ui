@@ -247,6 +247,52 @@ QPushButton:pressed {
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="camera3dButton">
+         <property name="minimumSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>60</width>
+           <height>60</height>
+          </size>
+         </property>
+         <property name="layoutDirection">
+          <enum>Qt::LeftToRight</enum>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">QPushButton {
+	background-position: center;
+	background-repeat: no-reperat;
+	border: none;
+	background-color: rgb(27, 29, 35);
+}
+QPushButton:hover {
+	background-color: rgb(33, 37, 43);
+}
+QPushButton:pressed {	
+	background-color: rgb(85, 170, 255);
+}</string>
+         </property>
+         <property name="text">
+          <string/>
+         </property>
+         <property name="icon">
+          <iconset resource="qtresources.qrc">
+           <normaloff>:/icons/24x24/cil-camera.png</normaloff>:/icons/24x24/cil-camera.png</iconset>
+         </property>
+         <property name="iconSize">
+          <size>
+           <width>24</width>
+           <height>24</height>
+          </size>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="uploadDatasetButton">
          <property name="minimumSize">
           <size>
@@ -755,6 +801,9 @@ QPushButton:pressed {
                <number>0</number>
               </property>
              </layout>
+            </widget>
+            <widget class="QWidget" name="camera3dPage">
+             <layout class="QVBoxLayout" name="verticalLayout_5"/>
             </widget>
            </widget>
           </item>

@@ -7,3 +7,6 @@ https://vision.in.tum.de/data/datasets/rgbd-dataset/download#freiburg1_xyz
 
 pointCloud
 https://files.gitter.im/vispy/vispy/eVM2/image.png
+
+SLAM
+https://wiki.ros.org/rgbdslam_electric/evaluation

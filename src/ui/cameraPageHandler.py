@@ -52,7 +52,7 @@ class CameraPageHandler:
         cameras = []
         lines = []
 
-        for timestamps in self.data.groundTruth.keys():
+        for timestamps in self.data.timestamps:
             currGroundTruth = self.data.groundTruth[timestamps]
 
             # Get the cameras location / rotation

@@ -1,5 +1,5 @@
 import os
-from src.datareader import DataReader
+from src.data.dataReader import DataReader
 from src.ui.videoPageHandler import VideoPageHandler
 from src.ui.pointCloudPageHandler import PointCloudPageHandler
 from src.ui.cameraPageHandler import CameraPageHandler

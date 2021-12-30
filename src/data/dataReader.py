@@ -1,6 +1,3 @@
-#import warnings
-# warnings.filterwarnings("ignore")
-
 import os
 import numpy as np
 import cv2
@@ -30,13 +27,13 @@ class Data:
         self.rgbFileNames = {}
         self.depthFileNames = {}
 
-        # Dictionaries containing the timestamps and ground truth movement relative to origin
-        self.groundTruth = {}
-
         # Dictionaries containing the timestamps and the image
         self.rgbImages = {}
         self.depthImages = {}
 
+        # Dictionaries containing the timestamps and ground truth movement relative to origin
+        self.groundTruth = {}
+       
 
 class DataReader:
 

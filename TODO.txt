@@ -1,13 +1,14 @@
 dataExtractor Class:
-    - timestamp array
-    - (timestamp, frame) dictionary
-    - (timestamp, stereoframe) dictionary (so each stereoframe will be twice in the values)
-    
-    - (timestamp, pointCloud) dictionary (maybe already sample here)
-    - (timestamp, modeledPointCloud) dictionary (maybe already sample here)
-    
-    - (timestamp, cameras) dictionary
-    - (timestamp, modeledCameras) dictionary
+    Data object:
+        - timestamp array
+        - (timestamp, frame) dictionary
+        - (timestamp, stereoframe) dictionary (so each stereoframe will be twice in the values)
+        
+        - (timestamp, pointCloud) dictionary (maybe already sample here)
+        - (timestamp, modeledPointCloud) dictionary (maybe already sample here)
+        
+        - (timestamp, cameras) dictionary
+        - (timestamp, modeledCameras) dictionary
 
 Right now, the logic id being done in the handlers
     - Split this with the model view controller

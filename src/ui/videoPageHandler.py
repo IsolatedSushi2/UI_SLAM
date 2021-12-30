@@ -16,7 +16,7 @@ class VideoPageHandler:
         # Update Timer for the video
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateFrame)
-        self.timer.start(1000 // 30)
+        self.timer.start(1000 // 1)
 
     # Go trough the images
     def updateFrame(self):

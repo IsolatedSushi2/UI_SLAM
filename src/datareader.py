@@ -5,7 +5,7 @@ import os
 import numpy as np
 import cv2
 from PIL import Image
-from src.constants import MAX_DATA_POINT_AMOUNT
+from src.constants import MAX_DATA_POINT_AMOUNT, DATA_INCREMENT_AMOUNT
 from src.associate import read_file_list, associate
 
 
@@ -57,13 +57,15 @@ class DataReader:
         # Get, and match the groundTruth
         dataObject.groundTruth, timestamps = DataReader().getGroundTruth(os.path.join(path, "groundtruth.txt"), timestamps)
 
+        timestamps = timestamps[::DATA_INCREMENT_AMOUNT]
+
         # Get the images from the matched timestamps
         dataObject.rgbImages = DataReader().getImages(path, timestamps, dataObject.rgbFileNames, np.uint8)
         dataObject.depthImages = DataReader().getImages(path, timestamps, dataObject.depthFileNames, np.uint16)
 
         #Get the final amount of stamps
         dataObject.timestamps = timestamps
-        print("From", initialAmount, "there are", len(timestamps), "timestamps remaining! (Max datapoint amount parameter is", MAX_DATA_POINT_AMOUNT, ")")
+        print("From", initialAmount, "there are", len(timestamps), "timestamps remaining! (Max datapoint amount parameter is", MAX_DATA_POINT_AMOUNT, "and increment amount is", DATA_INCREMENT_AMOUNT, ")")
 
         return dataObject
 

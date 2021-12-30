@@ -22,8 +22,6 @@ class CameraPageHandler:
 
         self.setSceneVisualsData()
 
-
-
     # Create the 3d vispy widget
     def createVispyWidget(self):
         self.canvas = scene.SceneCanvas(keys='interactive', size=(600, 600), show=True, bgcolor='black')
@@ -33,6 +31,7 @@ class CameraPageHandler:
 
         self.view.camera = 'turntable'  # scene.cameras.FlyCamera()  # or try 'arcball'
 
+    # Create the range slider widget
     def createRangeSliderWidget(self):
         self.rangeSlider = QRangeSlider()
 
@@ -40,11 +39,11 @@ class CameraPageHandler:
         self.rangeSlider.setMax(len(self.cameras))
         self.rangeSlider.setEnd(len(self.cameras))
         
+        # When value change, update
         self.rangeSlider.startValueChanged.connect(self.setSceneVisualsData)
         self.rangeSlider.endValueChanged.connect(self.setSceneVisualsData)
 
         self.ui.camera3dPage.layout().addWidget(self.rangeSlider)
-
 
     # Get the camera location, including its translation and rotation
     def getRenders(self):        
@@ -88,6 +87,7 @@ class CameraPageHandler:
         self.axis = visuals.XYZAxis(parent=self.view.scene)
     
     def setSceneVisualsData(self):
+        # Slice the selected cameras according to the rangeslider
         currCameras = self.cameras[self.rangeSlider.start(): self.rangeSlider.end()]
         currDirections = self.directions[self.rangeSlider.start() * 2: self.rangeSlider.end() * 2]
 
@@ -95,7 +95,3 @@ class CameraPageHandler:
 
         self.scatter.set_data(currCameras, edge_color=None, face_color=self.colors, size=10, scaling=False)
         self.lines.set_data(pos=currDirections, color=np.repeat(self.colors, 2, axis=0), connect="segments")
-
-        
-
-

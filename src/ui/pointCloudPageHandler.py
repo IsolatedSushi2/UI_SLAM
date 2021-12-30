@@ -49,7 +49,6 @@ class PointCloudPageHandler:
 
     # Inspired from the given generate_pointcloud.py, but optimised because it was way too slow
     def generate_point_cloud(self, timestamp, rotationMatrix):
-        print("Generating")
 
         rgb = self.data.rgbImages[timestamp]
         depth = self.data.depthImages[timestamp]
@@ -83,7 +82,7 @@ class PointCloudPageHandler:
         self.allColors = np.concatenate((self.allColors, colors))
 
         self.scatter.set_data(pos=self.allPos, edge_width=0, face_color=self.allColors, size=1, scaling=False)
-        self.currentFrameIndex = (self.currentFrameIndex + 20)
+        self.currentFrameIndex += 1
 
     def checkIfFinished(self):
         if self.currentFrameIndex < len(self.data.timestamps):
@@ -97,6 +96,8 @@ class PointCloudPageHandler:
         # Disable when not using the page (less computation and avoids the vispy memory leak bug)
         if self.ui.mainStackedWidget.currentIndex() != POINT_CLOUD_PAGE_INDEX:
             return
+
+        print("Generating process:",int(100*self.currentFrameIndex/len(self.data.timestamps)),"%")
 
         currTimestamp = self.data.timestamps[self.currentFrameIndex]
         currRGBImage = self.data.rgbImages[currTimestamp]

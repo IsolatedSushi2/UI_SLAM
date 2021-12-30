@@ -1,0 +1,41 @@
+Fix the rangeslider (the block movement doesnt feel nice)
+    - Can use the other one, but it was bugged (already asked question) https://github.com/napari/superqt
+
+Fix the rotation, rotate around center of mask
+    - Already asked question in the gitter
+
+Figure out how to handle camera rotation along the direction vector (do quaternions handle this?)
+
+Add rangesliders for the other views (pointcloud and camera)
+
+Add visualisation for the keyframe etc
+
+Add the directory upload
+
+Extract the fundamental matrix
+
+Extract camera pose
+
+Tool for comparing the camera movements
+
+Create point cloud with the camera movement
+    - Can do some corrections
+        - Dont use 2 frames, but more with the same keypoint to get better results
+            - Will have to lookup some more information
+
+try out some other datasets (All have to be the TUM format)
+
+Incorperate the evaluation tool that the TUM dataset provided 
+    - Can make some cool charts
+
+Make good video to showcase the tool
+
+We can drop the images themselves to save memory after extracting the data
+    - Would have change up some work, since it is sequential atm
+    - That system would allow multithreading as well I guess (No GIL issues since it is IO bound at some cases)
+
+Could haves:
+The depth map corrections (some papers about that subject)
+
+extreme ideas:
+Write in c++ for learning, and big performance gain

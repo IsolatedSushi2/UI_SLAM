@@ -1,8 +1,27 @@
+dataExtractor Class:
+    - timestamp array
+    - (timestamp, frame) dictionary
+    - (timestamp, stereoframe) dictionary (so each stereoframe will be twice in the values)
+    
+    - (timestamp, pointCloud) dictionary (maybe already sample here)
+    - (timestamp, modeledPointCloud) dictionary (maybe already sample here)
+    
+    - (timestamp, cameras) dictionary
+    - (timestamp, modeledCameras) dictionary
+
+Right now, the logic id being done in the handlers
+    - Split this with the model view controller
+        - Maybe do all calculations somewhere, this is better memorywise aswell
+
 Fix the rangeslider (the block movement doesnt feel nice)
     - Can use the other one, but it was bugged (already asked question) https://github.com/napari/superqt
 
 Fix the rotation, rotate around center of mask
     - Already asked question in the gitter
+
+Can map grayscale to RGB?
+
+Check the openCV keypoint matcher etc. parameters
 
 Figure out how to handle camera rotation along the direction vector (do quaternions handle this?)
 
@@ -36,6 +55,7 @@ We can drop the images themselves to save memory after extracting the data
 
 Could haves:
 The depth map corrections (some papers about that subject)
+Calculate the point clouds on a separate process? Maybe outsource to cpp directly
 
 extreme ideas:
 Write in c++ for learning, and big performance gain

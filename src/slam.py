@@ -1,4 +1,4 @@
-import os 
+import os
 from src.datareader import DataReader
 from src.ui.videoPageHandler import VideoPageHandler
 from src.ui.pointCloudPageHandler import PointCloudPageHandler
@@ -8,7 +8,6 @@ from src.camera import CameraParameters
 from src.constants import DEFAULT_DATASET_DIRECTORY, DEFAULT_CAMERA_PARAMETERS
 from src.constants import VIDEO_PAGE_INDEX, POINT_CLOUD_PAGE_INDEX, CAMERA_PAGE_INDEX
 cwd = os.getcwd()
-
 
 
 class SLAM:
@@ -22,12 +21,16 @@ class SLAM:
     # To make the buttons in the left menu work
     def connectLeftFrameButtons(self):
         # For changing the stackedwidget index
-        self.ui.videoButton.clicked.connect(lambda: self.setMainStackedPage(VIDEO_PAGE_INDEX))
-        self.ui.pointCloudButton.clicked.connect(lambda: self.setMainStackedPage(POINT_CLOUD_PAGE_INDEX))
-        self.ui.camera3dButton.clicked.connect(lambda: self.setMainStackedPage(CAMERA_PAGE_INDEX))
+        self.ui.videoButton.clicked.connect(
+            lambda: self.setMainStackedPage(VIDEO_PAGE_INDEX))
+        self.ui.pointCloudButton.clicked.connect(
+            lambda: self.setMainStackedPage(POINT_CLOUD_PAGE_INDEX))
+        self.ui.camera3dButton.clicked.connect(
+            lambda: self.setMainStackedPage(CAMERA_PAGE_INDEX))
 
         # Loading in the default dataset
-        self.ui.uploadDefaultDatasetButton.clicked.connect(self.loadDefaultDirectory)
+        self.ui.uploadDefaultDatasetButton.clicked.connect(
+            self.loadDefaultDirectory)
 
     # Load in a default dataset
     def loadDefaultDirectory(self):
@@ -44,8 +47,9 @@ class SLAM:
         print("Loaded in all data")
         self.ui.notificationLabel.setText("Loaded dataset: {}".format(path))
 
-        self.videoPageHandler = VideoPageHandler(self.ui, self.data)
-        self.pointCloudPageHandler = PointCloudPageHandler(self.ui, self.data, DEFAULT_CAMERA_PARAMETERS)
+        self.videoPageHandler = VideoPageHandler(self.ui, self.data, DEFAULT_CAMERA_PARAMETERS)
+        self.pointCloudPageHandler = PointCloudPageHandler(
+            self.ui, self.data, DEFAULT_CAMERA_PARAMETERS)
         self.cameraPageHandler = CameraPageHandler(self.ui, self.data)
 
     # Change the stackedWidget index

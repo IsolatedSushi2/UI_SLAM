@@ -6,24 +6,25 @@ import gc
 from pyquaternion import Quaternion
 from src.constants import MAX_POINTS_PER_CLOUD_RATIO, POINT_CLOUD_PAGE_INDEX
 
+
 class PointCloudPageHandler:
     def __init__(self, ui, dataObject, cameraParameters):
         self.ui = ui
         self.data = dataObject
         self.camParams = cameraParameters
 
-        self.allPos = np.empty((0,3))
-        self.allColors = np.empty((0,3))
+        self.allPos = np.empty((0, 3))
+        self.allColors = np.empty((0, 3))
 
         self.currentFrameIndex = 0
 
         self.setupWidget()
         self.addSceneVisuals()
-        
+
         # Update Timer for the video
         self.timer = QTimer()
         self.timer.timeout.connect(self.updateFrame)
-        self.timer.start(10)
+        self.timer.start(100)
 
     # Create the 3d vispy widget
     def setupWidget(self):
@@ -40,7 +41,8 @@ class PointCloudPageHandler:
         self.scatter = visuals.Markers()
 
         self.scatter.set_gl_state('opaque', depth_test=False)
-        self.scatter.set_data(pos=np.random.normal(size=(1, 3), scale=0.2), edge_color=None, face_color=(1, 1, 1, .5), size=10, scaling=True)
+        self.scatter.set_data(pos=np.random.normal(size=(
+            1, 3), scale=0.2), edge_color=None, face_color=(1, 1, 1, .5), size=10, scaling=True)
 
         self.view.add(self.scatter)
 
@@ -53,9 +55,9 @@ class PointCloudPageHandler:
         rgb = self.data.rgbImages[timestamp]
         depth = self.data.depthImages[timestamp]
 
-        depthMask = depth != 0        
+        depthMask = depth != 0
         width, height = depth.shape
-       
+
         colors = rgb[depthMask] / 255  # Need value between 0 and 1
         depth = depth[depthMask]
 
@@ -67,12 +69,14 @@ class PointCloudPageHandler:
         Y = np.multiply(u - self.camParams.centery, Z / self.camParams.focaly)
 
         positions = np.column_stack((X, Y, Z))
-        transformedPositions = rotationMatrix.dot(positions.T).T + self.data.groundTruth[timestamp].translation
+        transformedPositions = rotationMatrix.dot(
+            positions.T).T + self.data.groundTruth[timestamp].translation
         return transformedPositions, colors
 
     def samplePoints(self, positions, colors, sampleRatio):
         sampledPoints = int(len(positions) * sampleRatio)
-        sampledIndices = np.random.choice(range(len(positions)), sampledPoints, replace=False)
+        sampledIndices = np.random.choice(
+            range(len(positions)), sampledPoints, replace=False)
 
         return positions[sampledIndices], colors[sampledIndices]
 
@@ -81,7 +85,8 @@ class PointCloudPageHandler:
         self.allPos = np.concatenate((self.allPos, points))
         self.allColors = np.concatenate((self.allColors, colors))
 
-        self.scatter.set_data(pos=self.allPos, edge_width=0, face_color=self.allColors, size=1, scaling=False)
+        self.scatter.set_data(pos=self.allPos, edge_width=0,
+                              face_color=self.allColors, size=1, scaling=False)
         self.currentFrameIndex += 1
 
     def checkIfFinished(self):
@@ -97,7 +102,8 @@ class PointCloudPageHandler:
         if self.ui.mainStackedWidget.currentIndex() != POINT_CLOUD_PAGE_INDEX:
             return
 
-        print("Generating process:",int(100*self.currentFrameIndex/len(self.data.timestamps)),"%")
+        print("Generating process:", int(
+            100 * self.currentFrameIndex / len(self.data.timestamps)), "%")
 
         currTimestamp = self.data.timestamps[self.currentFrameIndex]
         currRGBImage = self.data.rgbImages[currTimestamp]
@@ -105,18 +111,13 @@ class PointCloudPageHandler:
 
         x, y, z, w = tuple(self.data.groundTruth[currTimestamp].quaternion)
         quaternion = Quaternion(x=x, y=y, z=z, w=w)
-        pos, colors = self.generate_point_cloud(currTimestamp, quaternion.rotation_matrix)
+        pos, colors = self.generate_point_cloud(
+            currTimestamp, quaternion.rotation_matrix)
 
         # To not get too many points, sample using the given ratio
-        pos, colors = self.samplePoints(pos, colors, MAX_POINTS_PER_CLOUD_RATIO)
+        pos, colors = self.samplePoints(
+            pos, colors, MAX_POINTS_PER_CLOUD_RATIO)
         self.renderPoints(pos, colors)
 
         self.canvas.measure_fps()
         self.checkIfFinished()
-
-
-        
-
-
-
-

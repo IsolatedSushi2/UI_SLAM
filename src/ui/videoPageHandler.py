@@ -3,16 +3,18 @@ from PyQt5.QtWidgets import QLabel
 from PyQt5.QtGui import QPixmap, QImage
 import cv2
 import numpy as np
-from src.constants import VIDEO_PAGE_INDEX
+from src.constants import VIDEO_PAGE_INDEX, STORE_ALL_IMAGES
 from src.frame import Frame, StereoFrame
 
 class VideoPageHandler:
-    def __init__(self, ui, dataObject, cameraParameters):
+    def __init__(self, ui, dataObject):
         self.ui = ui
         self.data = dataObject
 
         self.currentFrameIndex = 0 
-        self.camParams = cameraParameters
+
+        # First frame
+        self.updateFrame(True)
 
         # Update Timer for the video
         self.timer = QTimer()
@@ -20,25 +22,18 @@ class VideoPageHandler:
         self.timer.start(1000 // 10)
 
     # Go trough the images
-    def updateFrame(self):
+    def updateFrame(self, force=False):
 
         # Disable when not using the page (less computation and avoids the vispy memory leak bug)
-        if self.ui.mainStackedWidget.currentIndex() != VIDEO_PAGE_INDEX:
+        if self.ui.mainStackedWidget.currentIndex() != VIDEO_PAGE_INDEX and not force:
+            return
+
+        # The images are not stored
+        if not STORE_ALL_IMAGES:
             return
 
         currTimestamp = self.data.timestamps[self.currentFrameIndex]
-        currTimestamp2 = self.data.timestamps[self.currentFrameIndex + 1]
-
-        currRGBImage = self.data.rgbImages[currTimestamp]
-        currDepthImage = self.data.depthImages[currTimestamp]
-
-        currRGBImage2 = self.data.rgbImages[currTimestamp2]
-        currDepthImage2 = self.data.depthImages[currTimestamp2]
-
-        frame1 = Frame(currTimestamp, currRGBImage, currDepthImage, self.camParams)
-        frame2 = Frame(currTimestamp2, currRGBImage2, currDepthImage2, self.camParams)
-        
-        stereoFrame = StereoFrame(frame1, frame2)
+        stereoFrame = self.data.stereoFrames[currTimestamp]
 
         renderedStereoRGB, renderedStereoDepth = stereoFrame.getRenderedImages()
 
@@ -48,9 +43,9 @@ class VideoPageHandler:
         self.ui.rgbImage.setPixmap(currRGBPixMap)
         self.ui.depthImage.setPixmap(currDepthPixMap)
 
-
         # Update frame
-        self.currentFrameIndex = (self.currentFrameIndex + 2) % len(self.data.timestamps)
+        stereoFrameAmount = (len(self.data.timestamps) - 1)
+        self.currentFrameIndex = (self.currentFrameIndex + 1) % stereoFrameAmount
 
     # For translating numpy array to Pil image (don't want to keep everything in memory)
     def cv2ToQPixmap(self, currImage, imageFormat):

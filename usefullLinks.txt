@@ -13,3 +13,22 @@ https://wiki.ros.org/rgbdslam_electric/evaluation
 
 Custom VISPY Camera
 https://github.com/vispy/vispy/issues/1873
+
+Some implementation
+https://gist.github.com/jensenb/8668000
+
+Using the essential matrix
+https://stackoverflow.com/questions/33906111/how-do-i-estimate-positions-of-two-cameras-in-opencv
+
+Scaling the translation vector
+https://stackoverflow.com/questions/45195585/how-to-estimate-camera-translation-given-relative-rotation-and-intrinsic-matrix
+
+
+Use rodriguez to get rotation matrix from vector
+https://stackoverflow.com/questions/16265714/camera-pose-estimation-opencv-pnp
+
+https://docs.opencv.org/3.4/d9/d0c/group__calib3d.html#ga549c2075fac14829ff4a58bc931c033d
+
+implementation 
+https://avisingh599.github.io/vision/monocular-vo/
+https://github.com/uoip/monoVO-python/blob/master/visual_odometry.py

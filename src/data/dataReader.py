@@ -2,24 +2,38 @@ import os
 import numpy as np
 import cv2
 from PIL import Image
-from src.constants import MAX_DATA_POINT_AMOUNT, DATA_INCREMENT_AMOUNT
+from src.constants import MAX_DATA_POINT_AMOUNT
 from src.associate import read_file_list, associate
+from pyquaternion import Quaternion
 
 
-class GroundTruthRow:
-    def __init__(self, data):
+class CameraLocations:
+    def __init__(self):
+        self.translation = None
+        self.quaternion = None
 
+    def createFromValues(self, translation, quaternion):
+        self.translation = translation
+        self.quaternion = quaternion
+
+        return self
+
+    def createFromText(self, data):
         # Test whether correct data has been passed
         assert len(data) == 7
 
         self.translation = np.array(
             [float(data[0]), float(data[1]), float(data[2])])
-        self.quaternion = np.array(
-            [float(data[3]), float(data[4]), float(data[5]), float(data[6])])
+        self.quaternion = Quaternion(x=float(data[3]), y=float(data[4]), z=float(data[5]), w=float(data[6]))
+
+        return self
 
 
 class Data:
     def __init__(self):
+        # String containing the path to the dataset
+        self.path = ""
+
         # List containing timestamps
         self.timestamps = []
 
@@ -28,19 +42,25 @@ class Data:
         self.depthFileNames = {}
 
         # Dictionaries containing the timestamps and the image
-        self.rgbImages = {}
-        self.depthImages = {}
+        self.frames = {}
+        self.stereoFrames = {}
 
         # Dictionaries containing the timestamps and ground truth movement relative to origin
-        self.groundTruth = {}
+        self.trueCamLocs = {}
+        self.modeledCamLocs = {}
+
+        # Dictionaries containing the timestamps and pointClouds
+        self.truePointCloud = {}
+        self.modeledPointCloud = {}
        
 
 class DataReader:
 
     # Load in all data (according to the TUM dataset format)
     @staticmethod
-    def loadDirectory(path):
+    def loadTextFiles(path):
         dataObject = Data()
+        dataObject.path = path
         # Get initial timestamps (will shrink due to the matching)
         timestamps = DataReader.getTimeStamps(os.path.join(path, "rgb.txt"))
         initialAmount = len(timestamps)
@@ -56,21 +76,12 @@ class DataReader:
             os.path.join(path, "depth.txt"), timestamps)
 
         # Get, and match the groundTruth
-        dataObject.groundTruth, timestamps = DataReader().getGroundTruth(
-            os.path.join(path, "groundtruth.txt"), timestamps)
-
-        timestamps = timestamps[::DATA_INCREMENT_AMOUNT]
-
-        # Get the images from the matched timestamps
-        dataObject.rgbImages = DataReader().getImages(
-            path, timestamps, dataObject.rgbFileNames, np.uint8)
-        dataObject.depthImages = DataReader().getImages(
-            path, timestamps, dataObject.depthFileNames, np.uint16)
-
+        dataObject.trueCamLocs, timestamps = DataReader().getTrueCameraLocations(os.path.join(path, "groundtruth.txt"), timestamps)
+        
         # Get the final amount of stamps
         dataObject.timestamps = timestamps
         print("From", initialAmount, "there are", len(timestamps), "timestamps remaining! (Max datapoint amount parameter is",
-              MAX_DATA_POINT_AMOUNT, "and increment amount is", DATA_INCREMENT_AMOUNT, ")")
+              MAX_DATA_POINT_AMOUNT, ")")
 
         return dataObject
 
@@ -108,25 +119,23 @@ class DataReader:
 
     # Get the ground truth according to the actual sensor data from the TUM dataset
     @staticmethod
-    def getGroundTruth(path, rgbDict):
+    def getTrueCameraLocations(path, rgbDict):
         with open(path) as file:
             splitLines = [line.strip().split(' ')
                           for line in file if not line.startswith("#")]
 
-        groundTruths = [(float(line[0]), GroundTruthRow(line[1:]))
+        trueCamLocations = [(float(line[0]), CameraLocations().createFromText(line[1:]))
                         for line in splitLines]
 
-        return DataReader().matchTimeStamps(rgbDict, dict(groundTruths))
+        return DataReader().matchTimeStamps(rgbDict, dict(trueCamLocations))
 
     # Get the rgb and depth images, note that the rgb is 24 (8-8-8) bits, whilst depth is 16bit
     @staticmethod
-    def getImages(path, activeTimeStamps, fileNames, dtype):
-        returnDict = {}
+    def getImagePair(dataObject, currTimeStamp):
+        RGBFileName = dataObject.rgbFileNames[currTimeStamp]
+        depthFileName = dataObject.depthFileNames[currTimeStamp]
 
-        for currTimeStamp in activeTimeStamps:
-            currFileName = fileNames[currTimeStamp]
-            currImage = np.array(Image.open(
-                os.path.join(path, currFileName)), dtype=dtype)
-            returnDict[currTimeStamp] = currImage
+        rgbImage = np.array(Image.open(os.path.join(dataObject.path, RGBFileName)), dtype=np.uint8)
+        depthImage = np.array(Image.open(os.path.join(dataObject.path, depthFileName)), dtype=np.uint16)
 
-        return returnDict
+        return rgbImage, depthImage

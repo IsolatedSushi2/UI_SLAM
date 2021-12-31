@@ -2,46 +2,46 @@ import cv2
 import numpy as np
 from math import atan2, asin
 import open3d as o3d
-from src.constants import LOWES_RATIO_AMOUNT
+from src.constants import LOWES_RATIO_AMOUNT, DRAW_KEYPOINTS_MATCHES, KEYPOINT_FINDER, MATCHING_ALG
 
 
 class Frame:
-    def __init__(self, timestamp, rgbImage, depthImage, cameraParams, keypointFinder=cv2.ORB_create(1000)):
+    def __init__(self, timestamp, rgbImage, depthImage, cameraParams):
         self.timestamp = timestamp
         self.rgbImage = rgbImage
         self.depthImage = depthImage
-        self.kps, self.desc = self.findKeypointsInImage(keypointFinder)
+        self.kps, self.desc = self.findKeypointsInImage(KEYPOINT_FINDER)
         self.camParams = cameraParams
+
+    def clearImagesFromMemory(self):
+        del self.rgbImage
+        del self.depthImage
 
     def findKeypointsInImage(self, keypointFinder):
         kp, des = keypointFinder.detectAndCompute(self.rgbImage, None)
         return kp, des
 
-    def getRenderedImages(self, drawKeypoints):
+    def getRenderedImages(self):
         rgbImage = cv2.drawKeypoints(
-            self.rgbImage, self.kps, None, flags=cv2.DRAW_MATCHES_FLAGS_DEFAULT) if drawKeypoints else self.rgbImage
+            self.rgbImage, self.kps, None, flags=cv2.DRAW_MATCHES_FLAGS_DEFAULT) if DRAW_KEYPOINTS_MATCHES else self.rgbImage
         return (rgbImage, self.depthImage)
 
-    # Can be removed
-    def show(self, drawKeypoints=True):
-        rgbImage, depthImage = self.getRenderedImages(drawKeypoints)
-        renderedImage = np.hstack((rgbImage, depthImage))
-        cv2.imshow("Frame", renderedImage)
-        cv2.waitKey(0)
+# (stereoframe can be referenced by the timestamp of the first frame)
 
 
 class StereoFrame:
-    def __init__(self, frame1, frame2, matchingAlg=cv2.BFMatcher(cv2.NORM_HAMMING)):
+    def __init__(self, frame1, frame2):
         self.frame1 = frame1
         self.frame2 = frame2
-        self.matcher = matchingAlg
-        self.matches, self.pts1, self.pts2 = self.getMatches()
+        self.K = frame1.camParams.getKMatrix()
+        self.matches, self.pts1, self.pts2 = self.getMatches(MATCHING_ALG)
 
-    def getMatches(self):
-        matches = self.matcher.match(self.frame1.desc, self.frame2.desc)
-        matches = sorted(matches, key=lambda x: x.distance)[:LOWES_RATIO_AMOUNT]
+    def getMatches(self, matcher):
+        matches = matcher.match(self.frame1.desc, self.frame2.desc)
+        matches = sorted(matches, key=lambda x: x.distance)[
+            :LOWES_RATIO_AMOUNT]
 
-        # Replace for loop by numpy (significantly faster)
+        # TODO Replace for loop by numpy (significantly faster)
         pts1 = []
         pts2 = []
         # ratio test as per Lowe's paper
@@ -63,16 +63,20 @@ class StereoFrame:
 
         return K.T * F * K
 
-    def getRenderedImages(self, drawKeypoints=True):
-        rgbimg1, depthimg1 = self.frame1.getRenderedImages(drawKeypoints)
-        rgbimg2, depthimg2 = self.frame2.getRenderedImages(drawKeypoints)
+    def getRenderedImages(self):
+        rgbimg1, depthimg1 = self.frame1.getRenderedImages()
+        rgbimg2, depthimg2 = self.frame2.getRenderedImages()
 
-        img = cv2.drawMatches(self.frame1.rgbImage, self.frame1.kps,
-                              self.frame2.rgbImage, self.frame2.kps, self.matches, None)
+        # Render the rgb images with or without keypoints and matches
+        if DRAW_KEYPOINTS_MATCHES:
+            rgbImages = cv2.drawMatches(self.frame1.rgbImage, self.frame1.kps,
+                                        self.frame2.rgbImage, self.frame2.kps, self.matches, None)
+        else:
+            rgbImages = np.hstack((rgbimg1, rgbimg2))
 
         depthImages = np.hstack((depthimg1, depthimg2))
 
-        return img, depthImages
+        return rgbImages, depthImages
 
     # Can be removed
     def show(self, drawKeypoints=True):

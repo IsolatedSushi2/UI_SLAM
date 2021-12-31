@@ -7,8 +7,22 @@ dataExtractor Class:
         - (timestamp, pointCloud) dictionary (maybe already sample here)
         - (timestamp, modeledPointCloud) dictionary (maybe already sample here)
         
-        - (timestamp, cameras) dictionary
-        - (timestamp, modeledCameras) dictionary
+        - (timestamp, camerasLocations) dictionary
+        - (timestamp, modeledCamerasLocations) dictionary
+
+--------------------------------------------
+Finding camera pose method:
+    - With the first frame we can find the real 3d points of some of the keypoints
+    - Then we can find these keypoints in the second image and get the 2d points
+    - With solvePNP we can then find the rotation and translation matrix of the camera
+    - use Rodriguez to get the rotation matrix from the rotation vector
+    - These might be the overall values, instead of relative ones (not sure)
+    - Can combine these with other frames
+        - Use PnPRansac instead
+--------------------------------------------
+
+
+Model view controller for frame and stereoframe
 
 Right now, the logic id being done in the handlers
     - Split this with the model view controller

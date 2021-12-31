@@ -1,5 +1,5 @@
 import os
-from src.data.dataReader import DataReader
+from src.data.extractors.dataExtractor import DataExtractor
 from src.ui.videoPageHandler import VideoPageHandler
 from src.ui.pointCloudPageHandler import PointCloudPageHandler
 from src.ui.cameraPageHandler import CameraPageHandler
@@ -42,14 +42,13 @@ class SLAM:
     # Load in the data, and setup the widgets
     def loadDirectory(self, path):
 
-        self.data = DataReader().loadDirectory(path)
+        self.data = DataExtractor.loadDirectory(path, DEFAULT_CAMERA_PARAMETERS)
 
         print("Loaded in all data")
         self.ui.notificationLabel.setText("Loaded dataset: {}".format(path))
 
-        self.videoPageHandler = VideoPageHandler(self.ui, self.data, DEFAULT_CAMERA_PARAMETERS)
-        self.pointCloudPageHandler = PointCloudPageHandler(
-            self.ui, self.data, DEFAULT_CAMERA_PARAMETERS)
+        self.videoPageHandler = VideoPageHandler(self.ui, self.data)
+        self.pointCloudPageHandler = PointCloudPageHandler(self.ui, self.data)
         self.cameraPageHandler = CameraPageHandler(self.ui, self.data)
 
     # Change the stackedWidget index

@@ -6,15 +6,15 @@ import cv2
 DEFAULT_DATASET_DIRECTORY = os.path.join(os.getcwd(), "dataTUM", "rgbd_dataset_freiburg1_360")
 DEFAULT_CAMERA_PARAMETERS = CameraParameters(640, 480, 525, 525, 319.5, 239.5, 5000)
 
-MAX_DATA_POINT_AMOUNT = 100  # Use -1 if you want to use all the points
+MAX_DATA_POINT_AMOUNT = -1  # Use -1 if you want to use all the points
 
 # Image parameters
 STORE_ALL_IMAGES = True  # Whether to keep all the images in memory for displaying them in the video page (memory intensive)
 DRAW_KEYPOINTS_MATCHES = True  # Whether to render the keypoints and matches aswell
 
 # Pointcloud parameters
-POINTCLOUD_INCREMENT_AMOUNT = 20  # TODO Not usefull to take every pointCloud, reduce the amount
-MAX_POINTS_PER_CLOUD_RATIO = 0.5  # if equal to 1 it uses all the points, if equal 0.1 it uses 10% random points
+POINTCLOUD_INCREMENT_AMOUNT = 1  # TODO Not usefull to take every pointCloud, reduce the amount
+MAX_POINTS_PER_CLOUD_RATIO = 0.01  # if equal to 1 it uses all the points, if equal 0.1 it uses 10% random points
 
 # Algorithm parameters
 LOWES_RATIO_AMOUNT = 100  # For matching the keypoints

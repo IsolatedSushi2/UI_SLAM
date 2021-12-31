@@ -18,7 +18,7 @@ class CameraMovementExtractor:
             
             stereoFrame = data.stereoFrames[timeStamp]
             E = stereoFrame.getEssentialMatrix()
-            points, R, t, mask = CameraMovementExtractor.getCameraMovement(stereoFrame)
+            points, R, t, mask = CameraMovementExtractor.getCameraMovementEssentialMatrix(stereoFrame)
 
             rotationQuaternion = Quaternion(matrix=(R))
             finalQuaternion = rotationQuaternion * data.modeledCamLocs[timeStamp].quaternion
@@ -27,8 +27,12 @@ class CameraMovementExtractor:
             data.modeledCamLocs[nextTimestep] = CameraLocations().createFromValues(trueNextLocation.translation, finalQuaternion)
         return data
 
+
+
+
+    # This doesn't work very well, also still need to get the scaled translation vector
     @staticmethod
-    def getCameraMovement(stereoFrame):
+    def getCameraMovementEssentialMatrix(stereoFrame):
         pts_l_norm = cv2.undistortPoints(np.expand_dims(stereoFrame.pts1, axis=1), cameraMatrix=stereoFrame.K, distCoeffs=None)
         pts_r_norm = cv2.undistortPoints(np.expand_dims(stereoFrame.pts2, axis=1), cameraMatrix=stereoFrame.K, distCoeffs=None)
 

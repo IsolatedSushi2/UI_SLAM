@@ -52,6 +52,9 @@ class Data:
         # Dictionaries containing the timestamps and pointClouds
         self.truePointCloud = {}
         self.modeledPointCloud = {}
+
+        self.imgWidth = 0
+        self.imgHeight = 0
        
 
 class DataReader:
@@ -137,5 +140,7 @@ class DataReader:
 
         rgbImage = np.array(Image.open(os.path.join(dataObject.path, RGBFileName)), dtype=np.uint8)
         depthImage = np.array(Image.open(os.path.join(dataObject.path, depthFileName)), dtype=np.uint16)
+
+        dataObject.imgWidth, dataObject.imgHeight = depthImage.shape
 
         return rgbImage, depthImage

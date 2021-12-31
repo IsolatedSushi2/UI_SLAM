@@ -1,18 +1,21 @@
 from src.data.dataReader import DataReader
 from src.data.extractors.pointCloudExtractor import PointCloudExtractor
 from src.data.extractors.imageExtractor import ImageExtractor
-from src.constants import POINTCLOUD_INCREMENT_AMOUNT
+from src.constants import POINTCLOUD_INCREMENT_AMOUNT, MAX_POINTS_PER_CLOUD_RATIO
 from src.data.extractors.cameraMovementExtractor import CameraMovementExtractor
-
+import time
 class DataExtractor:
 
     @staticmethod
     def loadDirectory(path, camParams):
         data = DataReader.loadTextFiles(path)
-        print("Readed in text")
-        data = DataExtractor.extractData(data, camParams)
-        data = CameraMovementExtractor.extractCameraMovement(data)
+        print("Read in text")
 
+        time1 = time.time()
+        data = DataExtractor.extractData(data, camParams)
+        print("Extracting stereoFrames", time.time() - time1)
+
+        data = CameraMovementExtractor.extractCameraMovement(data)
         return data
 
     @staticmethod
@@ -28,7 +31,7 @@ class DataExtractor:
                 data.truePointCloud[timestamp] = pointCloud
 
         print("Extracted all Frames")
-        
+
         # Get the StereoFrames (stereoframe can be referenced by the timestamp of the first frame)
         for index in range(len(data.frames) - 1):
             timestamp1 = data.timestamps[index]
@@ -40,6 +43,7 @@ class DataExtractor:
             stereoFrame = ImageExtractor.getStereoFrame(frame1, frame2)
             data.stereoFrames[timestamp1] = stereoFrame
         
+
         print("Extracted all StereoFrames")
 
         return data
@@ -48,12 +52,14 @@ class DataExtractor:
     def extractFrameAndPC(data, timestamp, camParams, renderPointCloud):
         (currRGBImage, currDepthImage) = DataReader.getImagePair(data, timestamp)
         frame = ImageExtractor.getFrame(timestamp, currRGBImage, currDepthImage, camParams)
-        
+
         cameraLoc = data.trueCamLocs[timestamp]
         pointCloud = None
 
         if renderPointCloud:
-            pointCloud = PointCloudExtractor.generate_point_cloud(currRGBImage, currDepthImage, cameraLoc, camParams)
+            indices = PointCloudExtractor.getSamplePointsIndices(data.imgWidth, data.imgHeight, MAX_POINTS_PER_CLOUD_RATIO)
+            points, colors = PointCloudExtractor.generate_point_cloud_improved(currRGBImage, currDepthImage, indices, camParams)
+            pointCloud = PointCloudExtractor.translate_point_cloud(points, colors, cameraLoc)
+            #pointCloud = PointCloudExtractor.generate_point_cloud_improved(currRGBImage, currDepthImage, cameraLoc, camParams)
 
         return frame, pointCloud
-

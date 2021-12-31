@@ -49,6 +49,8 @@ class PointCloudPageHandler:
 
         return np.concatenate(truePos), np.concatenate(trueColors)
 
-    def renderPoints(self):        
+    def renderPoints(self):
         self.scatter.set_data(pos=self.truePositions, edge_width=0,
                               face_color=self.trueColours, size=1, scaling=False)
+
+        print("Rendered",len(self.truePositions),"points!")

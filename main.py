@@ -19,4 +19,3 @@ if __name__ == "__main__":
     # Create and run the application
     window = SLAMWindow(ui)
     sys.exit(app.exec_())
-

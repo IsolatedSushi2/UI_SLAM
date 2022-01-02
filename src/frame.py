@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 from math import atan2, asin
 import open3d as o3d
-from src.constants import LOWES_RATIO_AMOUNT, DRAW_KEYPOINTS_MATCHES, KEYPOINT_FINDER, MATCHING_ALG
+from src.constants import MAX_MATCH_AMOUNT, DRAW_KEYPOINTS_MATCHES, KEYPOINT_FINDER, MATCHING_ALG
 
 
 class Frame:
@@ -64,34 +64,14 @@ class StereoFrame:
         self.matches, self.pts1, self.pts2 = self.getMatches(MATCHING_ALG)
 
     def getMatches(self, matcher):
-
-        print(self.frame1.desc.shape)
-        print(self.frame2.desc.shape)
-        
         matches = matcher.match(self.frame1.desc, self.frame2.desc)
-        matches = sorted(matches, key=lambda x: x.distance)
-        print(len(matches))
-        exit()
+        matches = sorted(matches, key=lambda x: x.distance)[:MAX_MATCH_AMOUNT]
+
         # TODO Replace for loop by numpy
         pts1 = []
         pts2 = []
-        returnMatches = []
 
         for m in matches:
-
-            if(len(returnMatches) >= LOWES_RATIO_AMOUNT):
-                break
-
-            indices2 = self.frame2.roundedKeyPoints[m.trainIdx]
-            indices1 = self.frame1.roundedKeyPoints[m.queryIdx]
-
-            hasDepthVal2 = self.frame2.depthMap[indices2[1], indices1[0]]
-            hasDepthVal1 = self.frame1.depthMap[indices1[1], indices1[0]]
-
-            if not hasDepthVal1 or not hasDepthVal1:
-                continue
-
-            returnMatches.append(m)
             pts2.append(self.frame2.kps[m.trainIdx])
             pts1.append(self.frame1.kps[m.queryIdx])
 

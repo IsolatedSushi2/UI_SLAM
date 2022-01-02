@@ -22,7 +22,7 @@ POINTCLOUD_INCREMENT_AMOUNT = 1
 MAX_POINTS_PER_CLOUD_RATIO = 0.01
 
 # Algorithm parameters
-LOWES_RATIO_AMOUNT = 50  # For matching the keypoints
+MAX_MATCH_AMOUNT = 50  # For matching the keypoints
 KEYPOINT_FINDER = cv2.ORB_create(nfeatures=1000)
 MATCHING_ALG = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True) #  TODO play with crossCheck value
 

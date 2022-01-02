@@ -9,12 +9,13 @@ class PointCloudExtractor:
         translation = cameraLoc.translation
         rotationMatrix = cameraLoc.quaternion.rotation_matrix
 
-        transformedPositions = rotationMatrix.dot(positions.T).T + translation
+        rotatedPoints = rotationMatrix.dot(positions.T).T
+        transformedPositions = rotatedPoints + translation
 
         return transformedPositions, colors
 
     @staticmethod
-    # , sampledDepth, cameraLoc, camParams, u, v):
+    # Inspired from the given generate_pointcloud.py, but optimised because it was way too slow (around 50-100 times faster)
     def generate_point_cloud_improved(rgb, depth, indices, camParams):
 
         # Note, these are also u and v, since they are indexing by the pixels
@@ -37,34 +38,7 @@ class PointCloudExtractor:
         X = np.multiply(v - camParams.centerx, Z / camParams.focalx)
         Y = np.multiply(u - camParams.centery, Z / camParams.focaly)
 
-        return np.column_stack((X, Y, Z)), colors
-
-    # Inspired from the given generate_pointcloud.py, but optimised because it was way too slow
-
-    @staticmethod
-    def generate_point_cloud(rgbImage, depthImage, cameraLoc, camParams):
-        translation = cameraLoc.translation
-        rotationMatrix = cameraLoc.quaternion.rotation_matrix
-
-        depthMask = depthImage != 0
-        width, height = depthImage.shape
-
-        colors = rgbImage[depthMask] / 255  # Need value between 0 and 1
-        depth = depthImage[depthMask]
-
-        # TODO, do the sampling before extracting the positions
-        # Optimized numpy implementation instead of the slow for loops from the datasets authors
-        Z = depth / camParams.depthScalingFactor
-        u = np.tile(np.arange(width), (height, 1)).T[depthMask]
-        v = np.tile(np.arange(height), (width, 1))[depthMask]
-        X = np.multiply(v - camParams.centerx, Z / camParams.focalx)
-        Y = np.multiply(u - camParams.centery, Z / camParams.focaly)
-
-        positions = np.column_stack((X, Y, Z))
-        transformedPositions = rotationMatrix.dot(
-            positions.T).T + translation
-
-        return PointCloudExtractor.samplePoints(transformedPositions, colors, MAX_POINTS_PER_CLOUD_RATIO)
+        return np.column_stack((X, Y, Z)), colors, depthMask
 
     # Does contain duplicates
     @staticmethod

@@ -116,7 +116,8 @@ class CameraPageHandler:
     def renderTrueCameras(self):
         trueData = self.getSlicedRenders(self.trueCameras, self.trueDirections, 'yellow', 'green')
         currCams, currDirects, pointColors, lineColors = trueData
-
+        print(currCams[0])
+        print(currCams.shape)
         self.trueScatter.set_data(currCams, edge_color=None,
                                 face_color=pointColors, size=10, scaling=False)
         self.trueLines.set_data(pos=currDirects, color=lineColors, connect="segments")
@@ -124,9 +125,11 @@ class CameraPageHandler:
     def renderModeledCameras(self):
         modeledData = self.getSlicedRenders(self.modeledCameras, self.modeledDirections, 'blue', 'red')
         currCams, currDirects, pointColors, lineColors = modeledData
-
+        print(currCams[0])
+        print(currCams.shape)
+        print(currCams[0].shape)
         self.modeledScatter.set_data(currCams, edge_color=None,
-                                face_color=pointColors, size=10, scaling=False)
+                                face_color=(1,1,1,1), size=10, scaling=False)
         self.modeledLines.set_data(pos=currDirects, color=lineColors, connect="segments")
 
     def setSceneVisualsData(self):

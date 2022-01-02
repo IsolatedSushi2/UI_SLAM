@@ -4,6 +4,8 @@ from src.data.extractors.imageExtractor import ImageExtractor
 from src.constants import POINTCLOUD_INCREMENT_AMOUNT, MAX_POINTS_PER_CLOUD_RATIO
 from src.data.extractors.cameraMovementExtractor import CameraMovementExtractor
 import time
+
+
 class DataExtractor:
 
     @staticmethod
@@ -24,7 +26,8 @@ class DataExtractor:
         # Get the frames and pointClouds
         for index, timestamp in enumerate(data.timestamps):
             renderPointCloud = index % POINTCLOUD_INCREMENT_AMOUNT == 0
-            frame, pointCloud = DataExtractor.extractFrameAndPC(data, timestamp, camParams, renderPointCloud)
+            frame, pointCloud = DataExtractor.extractFrameAndPC(
+                data, timestamp, camParams, renderPointCloud)
             data.frames[timestamp] = frame
 
             if renderPointCloud:
@@ -42,7 +45,6 @@ class DataExtractor:
 
             stereoFrame = ImageExtractor.getStereoFrame(frame1, frame2)
             data.stereoFrames[timestamp1] = stereoFrame
-        
 
         print("Extracted all StereoFrames")
 
@@ -51,15 +53,26 @@ class DataExtractor:
     @staticmethod
     def extractFrameAndPC(data, timestamp, camParams, renderPointCloud):
         (currRGBImage, currDepthImage) = DataReader.getImagePair(data, timestamp)
-        frame = ImageExtractor.getFrame(timestamp, currRGBImage, currDepthImage, camParams)
+        frame = ImageExtractor.getFrame(
+            timestamp, currRGBImage, currDepthImage, camParams)
+
+        indices = frame.getRoundedKeypointIndices()
+        points, _, depthmask = PointCloudExtractor.generate_point_cloud_improved(currRGBImage, currDepthImage, indices, camParams)
+
+        relativeKPSPointCloud = points
+        frame.realKPS = frame.kps[depthmask]
+
+        for i, val in enumerate(frame.realKPS):
+            frame.relativeKPSPointCloud[tuple(val)] = relativeKPSPointCloud[i]
 
         cameraLoc = data.trueCamLocs[timestamp]
         pointCloud = None
-
-        if renderPointCloud:
-            indices = PointCloudExtractor.getSamplePointsIndices(data.imgWidth, data.imgHeight, MAX_POINTS_PER_CLOUD_RATIO)
-            points, colors = PointCloudExtractor.generate_point_cloud_improved(currRGBImage, currDepthImage, indices, camParams)
-            pointCloud = PointCloudExtractor.translate_point_cloud(points, colors, cameraLoc)
-            #pointCloud = PointCloudExtractor.generate_point_cloud_improved(currRGBImage, currDepthImage, cameraLoc, camParams)
+        if False: # renderPointCloud:
+            indices = PointCloudExtractor.getSamplePointsIndices(
+                data.imgWidth, data.imgHeight, MAX_POINTS_PER_CLOUD_RATIO)
+            points, colors, _ = PointCloudExtractor.generate_point_cloud_improved(
+                currRGBImage, currDepthImage, indices, camParams)
+            pointCloud = PointCloudExtractor.translate_point_cloud(
+                points, colors, cameraLoc)
 
         return frame, pointCloud

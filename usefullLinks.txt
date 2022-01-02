@@ -35,3 +35,6 @@ https://github.com/uoip/monoVO-python/blob/master/visual_odometry.py
 
 Subset of keypoints AFTER detecting
 https://stackoverflow.com/questions/67622830/how-do-i-mask-opencvs-keypoints-post-detection
+
+Keypoints before detecting
+https://stackoverflow.com/questions/42346761/opencv-python-feature-detection-how-to-provide-a-mask-sift

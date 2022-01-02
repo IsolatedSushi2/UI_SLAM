@@ -10,7 +10,7 @@ class Frame:
         self.timestamp = timestamp
         self.rgbImage = rgbImage
         self.depthImage = depthImage
-        self.keypoints, self.kps, self.desc, self.roundedKeyPoints = self.findKeypointsInImage(
+        self.keypoints, self.kps, self.desc, self.roundedKeyPoints = self.findKeypointsInImageBefore(
             KEYPOINT_FINDER)
 
         self.depthMap = self.getDepthMap()
@@ -35,7 +35,24 @@ class Frame:
         del self.rgbImage
         del self.depthImage
 
-    def findKeypointsInImage(self, keypointFinder):
+    # First method, specifying a mask deleting the invalid depth values beforehand
+
+    def findKeypointsInImageBefore(self, keypointFinder):
+        depthMask = np.asarray(self.depthImage != 0, dtype=np.uint8)
+        # Find keypoints
+        kps, des = keypointFinder.detectAndCompute(
+            self.rgbImage, mask=depthMask)
+
+        kPoints = np.array([keypoint.pt for keypoint in kps])
+        roundedKpoints = np.asarray(np.rint(kPoints), dtype=np.uint16)
+
+        # Return values with the depth mask
+        return np.array(kps), kPoints, des, roundedKpoints
+
+    # Second method, specifying a mask deleting the invalid depth values afterwards
+
+    def findKeypointsInImageAfter(self, keypointFinder):
+
         # Find keypoints
         kps, des = keypointFinder.detectAndCompute(self.rgbImage, None)
 
@@ -44,7 +61,9 @@ class Frame:
         roundedKpoints = np.asarray(np.rint(kPoints), dtype=np.uint16)
 
         # Check which ones have a depth value associated
-        kpsDepthMask = self.depthImage[roundedKpoints[:, 1], roundedKpoints[:, 0]] != 0
+        kpsDepthMask = self.depthImage[roundedKpoints[:,
+                                                      1], roundedKpoints[:, 0]] != 0
+        print(np.count_nonzero(~kpsDepthMask))
 
         # Return values with the depth mask
         return np.array(kps)[kpsDepthMask], kPoints[kpsDepthMask], des[kpsDepthMask], roundedKpoints[kpsDepthMask]
@@ -65,18 +84,13 @@ class StereoFrame:
 
     def getMatches(self, matcher):
         matches = matcher.match(self.frame1.desc, self.frame2.desc)
-        matches = sorted(matches, key=lambda x: x.distance)[:MAX_MATCH_AMOUNT]
+        matches = sorted(matches, key=lambda x: x.distance)
+        matches = matches[:MAX_MATCH_AMOUNT]
 
-        # TODO Replace for loop by numpy
-        pts1 = []
-        pts2 = []
-
-        for m in matches:
-            pts2.append(self.frame2.kps[m.trainIdx])
-            pts1.append(self.frame1.kps[m.queryIdx])
-
-        pts1 = np.float64(pts1)
-        pts2 = np.float64(pts2)
+        pts1 = np.float64([self.frame1.kps[match.queryIdx]
+                          for match in matches])
+        pts2 = np.float64([self.frame2.kps[match.trainIdx]
+                          for match in matches])
 
         return matches, pts1, pts2
 

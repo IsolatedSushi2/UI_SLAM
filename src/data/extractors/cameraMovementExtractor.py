@@ -8,6 +8,21 @@ from pyquaternion import Quaternion
 class CameraMovementExtractor:
     @staticmethod
     def extractCameraMovement(data):
+
+        # Get the StereoFrames (stereoframe can be referenced by the timestamp of the first frame)
+        for index in range(len(data.frames) - 1):
+            timestamp1 = data.timestamps[index]
+            timestamp2 = data.timestamps[index + 1]
+
+            frame1 = data.frames[timestamp1]
+            frame2 = data.frames[timestamp2]
+
+            stereoFrame = ImageExtractor.getStereoFrame(frame1, frame2)
+            data.stereoFrames[timestamp1] = stereoFrame
+
+        print("Extracted all StereoFrames")
+
+
         print("There are", len(data.timestamps), "timestamps")
 
         # Get the initial translation and rotation

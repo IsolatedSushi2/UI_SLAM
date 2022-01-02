@@ -61,7 +61,6 @@ class DataExtractor:
             currRGBImage, currDepthImage, indices, camParams)
 
         frame.relativeKPSPointCloud = points
-        print(len(frame.relativeKPSPointCloud))
         cameraLoc = data.trueCamLocs[timestamp]
         pointCloud = None
         if renderPointCloud:

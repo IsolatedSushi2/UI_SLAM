@@ -17,13 +17,6 @@ class Frame:
 
         self.relativeKPSPointCloud = None
 
-    def setMapper(self, mask):
-        self.roundedKeyPoints = self.roundedKeyPoints[mask]
-        print(self.roundedKeyPoints)
-
-    def getDepthMap(self):
-        return self.depthImage != 0
-
     def getRoundedKeypointIndices(self):
         v, u = zip(*self.roundedKeyPoints)
         return np.array(u, np.uint16), np.array(v, np.uint16)
@@ -33,7 +26,6 @@ class Frame:
         del self.depthImage
 
     # First method, specifying a mask deleting the invalid depth values beforehand
-
     def findKeypointsInImageBefore(self, keypointFinder):
         depthMask = np.asarray(self.depthImage != 0, dtype=np.uint8)
         # Find keypoints
@@ -97,8 +89,7 @@ class StereoFrame:
         pts2 = np.float64(self.frame2.kps[frame2Indices])
 
         # Just use the pointclouds used in matches
-        print(frame1Indices)
-        print(self.frame1.relativeKPSPointCloud.shape)
+
         self.frame1KPS = self.frame1.relativeKPSPointCloud[frame1Indices]
         self.frame2KPS = self.frame2.relativeKPSPointCloud[frame2Indices]
 

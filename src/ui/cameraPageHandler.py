@@ -129,7 +129,7 @@ class CameraPageHandler:
         print(currCams.shape)
         print(currCams[0].shape)
         self.modeledScatter.set_data(currCams, edge_color=None,
-                                face_color=(1,1,1,1), size=10, scaling=False)
+                                face_color=pointColors, size=10, scaling=False)
         self.modeledLines.set_data(pos=currDirects, color=lineColors, connect="segments")
 
     def setSceneVisualsData(self):

@@ -11,7 +11,7 @@ class VideoPageHandler:
         self.ui = ui
         self.data = dataObject
 
-        self.currentFrameIndex = 0 
+        self.currentFrameIndex = 0
 
         # First frame
         self.updateFrame(True)

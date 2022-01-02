@@ -1,6 +1,5 @@
 import os
 from src.camera import CameraParameters
-from src.slamAlgorithms.exampleSLAM import ExampleSLAM
 import cv2
 
 # Dataset parameters
@@ -23,8 +22,7 @@ POINTCLOUD_INCREMENT_AMOUNT = 1
 MAX_POINTS_PER_CLOUD_RATIO = 0.01
 
 # Algorithm parameters
-DEFAULT_SLAM_ALGORITHM = ExampleSLAM #  Just use the class name, initialisation happens automatically later
-MAX_MATCH_AMOUNT = 50  # For matching the keypoints
+MAX_MATCH_AMOUNT = 60  # For matching the keypoints
 KEYPOINT_FINDER = cv2.ORB_create(nfeatures=1000)
 MATCHING_ALG = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True) #  TODO play with crossCheck value
 

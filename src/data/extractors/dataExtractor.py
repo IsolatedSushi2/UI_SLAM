@@ -2,7 +2,8 @@ from src.data.dataReader import DataReader
 from src.data.extractors.pointCloudExtractor import PointCloudExtractor
 from src.data.extractors.imageExtractor import ImageExtractor
 from src.constants import POINTCLOUD_INCREMENT_AMOUNT, MAX_POINTS_PER_CLOUD_RATIO
-from src.data.extractors.cameraMovementExtractor import CameraMovementExtractor
+from src.slamAlgorithms.exampleSLAM import ExampleSLAM
+
 import time
 
 
@@ -16,8 +17,8 @@ class DataExtractor:
         print("Extracted all Frames")
         data = DataExtractor.getStereoFrames(data)
         print("Extracted all StereoFrames")
-
-        data = CameraMovementExtractor.extractCameraMovement(data)
+        SLAMAlgorithm = ExampleSLAM(data)
+        data = SLAMAlgorithm.extractCameraMovement()
         return data
 
     @staticmethod
@@ -59,12 +60,8 @@ class DataExtractor:
         points, _, depthmask = PointCloudExtractor.generate_point_cloud_improved(
             currRGBImage, currDepthImage, indices, camParams)
 
-        relativeKPSPointCloud = points
-        frame.realKPS = frame.kps[depthmask]
-
-        for i, val in enumerate(frame.realKPS):
-            frame.relativeKPSPointCloud[tuple(val)] = relativeKPSPointCloud[i]
-
+        frame.relativeKPSPointCloud = points
+        print(len(frame.relativeKPSPointCloud))
         cameraLoc = data.trueCamLocs[timestamp]
         pointCloud = None
         if renderPointCloud:

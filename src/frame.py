@@ -13,12 +13,9 @@ class Frame:
         self.keypoints, self.kps, self.desc, self.roundedKeyPoints = self.findKeypointsInImageBefore(
             KEYPOINT_FINDER)
 
-        self.depthMap = self.getDepthMap()
         self.camParams = cameraParams
 
-        self.realKPS = None
-        self.relativeKPSPointCloud = {}
-        self.relativeMapper = np.arange(len(self.kps))
+        self.relativeKPSPointCloud = None
 
     def setMapper(self, mask):
         self.roundedKeyPoints = self.roundedKeyPoints[mask]
@@ -79,6 +76,10 @@ class StereoFrame:
     def __init__(self, frame1, frame2):
         self.frame1 = frame1
         self.frame2 = frame2
+
+        self.frame1KPS = None
+        self.frame2KPS = None
+
         self.K = frame1.camParams.getKMatrix()
         self.matches, self.pts1, self.pts2 = self.getMatches(MATCHING_ALG)
 
@@ -87,19 +88,21 @@ class StereoFrame:
         matches = sorted(matches, key=lambda x: x.distance)
         matches = matches[:MAX_MATCH_AMOUNT]
 
-        pts1 = np.float64([self.frame1.kps[match.queryIdx]
-                          for match in matches])
-        pts2 = np.float64([self.frame2.kps[match.trainIdx]
-                          for match in matches])
+        frame1Indices = np.array(
+            [match.queryIdx for match in matches], dtype=np.int16)
+        frame2Indices = np.array(
+            [match.trainIdx for match in matches], dtype=np.int16)
+
+        pts1 = np.float64(self.frame1.kps[frame1Indices])
+        pts2 = np.float64(self.frame2.kps[frame2Indices])
+
+        # Just use the pointclouds used in matches
+        print(frame1Indices)
+        print(self.frame1.relativeKPSPointCloud.shape)
+        self.frame1KPS = self.frame1.relativeKPSPointCloud[frame1Indices]
+        self.frame2KPS = self.frame2.relativeKPSPointCloud[frame2Indices]
 
         return matches, pts1, pts2
-
-    def getMatchesIndices(self, frameNumber):
-
-        if frameNumber == 1:
-            return np.asarray(self.pts1)
-        if frameNumber == 2:
-            return np.asarray(self.pts2)
 
     def getFundamentalMatrix(self):
         return cv2.findFundamentalMat(self.pts1, self.pts2, cv2.FM_LMEDS)

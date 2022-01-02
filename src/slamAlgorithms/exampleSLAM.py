@@ -1,5 +1,9 @@
 from src.slamAlgorithms.baseSLAM import BaseSLAM
-
+import cv2
+import numpy as np
+from src.camera import CameraLocations
+from src.data.extractors.pointCloudExtractor import PointCloudExtractor
+from pyquaternion import Quaternion
 #  Simple SLAM algorithm (one relative constraint per stereoFrame)
 
 
@@ -7,75 +11,67 @@ class ExampleSLAM(BaseSLAM):
     def __init__(self, data):
         self.data = data
 
-    def extractCameraMovement():
+    def extractCameraMovement(self):
 
         # Get the initial translation and rotation
-        firstTimeStamp = data.timestamps[0]
-        firstLoc = data.trueCamLocs[firstTimeStamp]
-        data.modeledCamLocs[firstTimeStamp] = CameraLocations(
+        firstTimeStamp = self.data.timestamps[0]
+        firstLoc = self.data.trueCamLocs[firstTimeStamp]
+        self.data.modeledCamLocs[firstTimeStamp] = CameraLocations(
         ).createFromValues(firstLoc.translation, firstLoc.quaternion)
 
-        for index, timeStamp in enumerate(data.timestamps[:-1]):
-            nextTimeStamp = data.timestamps[index + 1]
+        self.data = self.calculateCameraLocations()
+        self.printAllResults(10)
+
+        return self.data
+
+    def calculateCameraLocations(self):
+        for index, timeStamp in enumerate(self.data.timestamps[:-1]):
+            nextTimeStamp = self.data.timestamps[index + 1]
 
             # Debugging purposes
-            trueCurrLocation = data.trueCamLocs[timeStamp]
-            trueNextLocation = data.trueCamLocs[nextTimeStamp]
+            trueCurrLocation = self.data.trueCamLocs[timeStamp]
+            trueNextLocation = self.data.trueCamLocs[nextTimeStamp]
 
-            modeledLocation = data.modeledCamLocs[timeStamp]
+            modeledLocation = self.data.modeledCamLocs[timeStamp]
 
-            stereoFrame = data.stereoFrames[timeStamp]
+            stereoFrame = self.data.stereoFrames[timeStamp]
 
-            # Get the 3dPositions of the first frame
-            firstFrameIndices = stereoFrame.getMatchesIndices(1)
-            framePoints = np.array([stereoFrame.frame1.relativeKPSPointCloud[tuple(
-                currFrame)] for currFrame in firstFrameIndices])
+            relativePositions3D = stereoFrame.frame1KPS
 
-            #positions3D, _ = PointCloudExtractor.translate_point_cloud(framePoints, None, modeledLocation)
             positions3D, _ = PointCloudExtractor.translate_point_cloud(
-                framePoints, None, trueCurrLocation)
+                relativePositions3D, None, trueCurrLocation)
+            # positions3D, _ = PointCloudExtractor.translate_point_cloud(
+            #     relativePositions3D, None, modeledLocation)
 
-            succes, rVector, rTrans, inLiers = cv2.solvePnPRansac(
-                positions3D, stereoFrame.pts2, stereoFrame.K, None)
-            rotationMatrix, _ = cv2.Rodrigues(rVector)
+            cameraLoc = self.getCameraLocationPNP(positions3D, stereoFrame.pts2, stereoFrame.K)
+            self.data.modeledCamLocs[nextTimeStamp] = cameraLoc
 
-            cameraRotation = rotationMatrix.T
-            cameraLocation = np.array(-np.matrix(cameraRotation)
-                                      * np.matrix(rTrans))
+        return self.data
 
-            cameraLocation = np.array([float(cameraLocation[0]), float(
-                cameraLocation[1]), float(cameraLocation[2])])
+    def printAllResults(self, amount):
+        for timestamp in self.data.timestamps[:amount]:
+            self.printResults(timestamp)
 
-            if not succes:
-                print("SOLVEPNP ERROR")
-            #finalQuaternion = Quaternion(matrix=cameraLocation)
+    # Debugging purposes
+    def printResults(self, timestamp):
+        trueLoc = self.data.trueCamLocs[timestamp]
+        modeledLoc = self.data.modeledCamLocs[timestamp]
+        print("True: Modeled:")
+        print(trueLoc.translation, modeledLoc.translation)
 
-            # print("Succes", succes)
-
-            # print(trueNextLocation.translation, "Real Location")
-
-            # print("Calculated Rotation:\n", cameraRotation)
-            # print("Real Rotation:\n", trueNextLocation.quaternion.rotation_matrix)
-
-            finalQuaternion = Quaternion(matrix=cameraRotation)
-
-            data.modeledCamLocs[nextTimeStamp] = CameraLocations().createFromValues(
-                cameraLocation, finalQuaternion)
-        return data
-
-    def getCameraLocationPNP(points3D, points2D, cameraMatrix):
+    def getCameraLocationPNP(self, points3D, points2D, cameraMatrix):
         succes, rVector, rTrans, inLiers = cv2.solvePnPRansac(
             points3D, points2D, cameraMatrix, None)
 
         assert succes is True
 
         # Get the camera position and location in world space
-        cameraRotation = cv2.Rodrigues(rVector).T
+        cameraRotation = cv2.Rodrigues(rVector)[0].T
         cameraTranslation = np.array(-np.matrix(cameraRotation) * np.matrix(rTrans))
 
         # TODO, simplify this
-        cameraTranslation = np.array([float(cameraLocation[0]), float(
-            cameraLocation[1]), float(cameraLocation[2])])
+        cameraTranslation = np.array([float(cameraTranslation[0]), float(
+            cameraTranslation[1]), float(cameraTranslation[2])])
 
         finalQuaternion = Quaternion(matrix=cameraRotation)
         return CameraLocations().createFromValues(cameraTranslation, finalQuaternion)

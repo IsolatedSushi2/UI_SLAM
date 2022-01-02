@@ -11,11 +11,8 @@ class DataExtractor:
     @staticmethod
     def loadDirectory(path, camParams):
         data = DataReader.loadTextFiles(path)
-        print("Read in text")
 
-        time1 = time.time()
         data = DataExtractor.extractData(data, camParams)
-        print("Extracting stereoFrames", time.time() - time1)
 
         data = CameraMovementExtractor.extractCameraMovement(data)
         return data

@@ -4,31 +4,9 @@ import cv2
 from PIL import Image
 from src.constants import MAX_DATA_POINT_AMOUNT
 from src.associate import read_file_list, associate
-from pyquaternion import Quaternion
+from src.camera import CameraLocations
 
-
-class CameraLocations:
-    def __init__(self):
-        self.translation = None
-        self.quaternion = None
-
-    def createFromValues(self, translation, quaternion):
-        self.translation = translation
-        self.quaternion = quaternion
-
-        return self
-
-    def createFromText(self, data):
-        # Test whether correct data has been passed
-        assert len(data) == 7
-
-        self.translation = np.array(
-            [float(data[0]), float(data[1]), float(data[2])])
-        self.quaternion = Quaternion(x=float(data[3]), y=float(data[4]), z=float(data[5]), w=float(data[6]))
-
-        return self
-
-
+# Main dataObject
 class Data:
     def __init__(self):
         # String containing the path to the dataset
@@ -55,8 +33,9 @@ class Data:
 
         self.imgWidth = 0
         self.imgHeight = 0
-       
 
+
+# Static class for reading in the data (TUM dataset format)
 class DataReader:
 
     # Load in all data (according to the TUM dataset format)
@@ -79,8 +58,9 @@ class DataReader:
             os.path.join(path, "depth.txt"), timestamps)
 
         # Get, and match the groundTruth
-        dataObject.trueCamLocs, timestamps = DataReader().getTrueCameraLocations(os.path.join(path, "groundtruth.txt"), timestamps)
-        
+        dataObject.trueCamLocs, timestamps = DataReader().getTrueCameraLocations(
+            os.path.join(path, "groundtruth.txt"), timestamps)
+
         # Get the final amount of stamps
         dataObject.timestamps = timestamps
         print("From", initialAmount, "there are", len(timestamps), "timestamps remaining! (Max datapoint amount parameter is",
@@ -88,14 +68,14 @@ class DataReader:
 
         return dataObject
 
-    # Have to match the timestamps from the different images manually TODO fix when a match cannot be found
+    # Have to match the timestamps from the different images manually
+    # The Kinect from the dataset asynchronously returns RGB and depth images
     @staticmethod
     def matchTimeStamps(timestamps, matchDict):
         matches = associate(timestamps, matchDict)
         returnDict = dict([(timestamp, matchDict[matchKey])
                           for timestamp, matchKey in matches])
 
-        # assert len(returnDict.keys()) == len(rgbDict.keys()), "Error with matching timestamps {} {}".format(len(returnDict.keys()), len(rgbDict.keys()))
         return returnDict, list(returnDict.keys())
 
     # Get all the timestamps
@@ -105,7 +85,7 @@ class DataReader:
             lines = [line.strip() for line in file if not line.startswith("#")]
 
         timestamps = [float(line.split(' ')[0]) for line in lines]
-        timestamps.sort()
+        timestamps.sort()  # We want to traverse the images in order
 
         return timestamps
 
@@ -128,7 +108,7 @@ class DataReader:
                           for line in file if not line.startswith("#")]
 
         trueCamLocations = [(float(line[0]), CameraLocations().createFromText(line[1:]))
-                        for line in splitLines]
+                            for line in splitLines]
 
         return DataReader().matchTimeStamps(rgbDict, dict(trueCamLocations))
 
@@ -138,8 +118,10 @@ class DataReader:
         RGBFileName = dataObject.rgbFileNames[currTimeStamp]
         depthFileName = dataObject.depthFileNames[currTimeStamp]
 
-        rgbImage = np.array(Image.open(os.path.join(dataObject.path, RGBFileName)), dtype=np.uint8)
-        depthImage = np.array(Image.open(os.path.join(dataObject.path, depthFileName)), dtype=np.uint16)
+        rgbImage = np.array(Image.open(os.path.join(
+            dataObject.path, RGBFileName)), dtype=np.uint8)
+        depthImage = np.array(Image.open(os.path.join(
+            dataObject.path, depthFileName)), dtype=np.uint16)
 
         dataObject.imgWidth, dataObject.imgHeight = depthImage.shape
 

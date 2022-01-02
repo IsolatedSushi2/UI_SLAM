@@ -3,23 +3,28 @@ from src.camera import CameraParameters
 import cv2
 
 # Dataset parameters
-DEFAULT_DATASET_DIRECTORY = os.path.join(os.getcwd(), "dataTUM", "rgbd_dataset_freiburg1_360")
-DEFAULT_CAMERA_PARAMETERS = CameraParameters(640, 480, 525, 525, 319.5, 239.5, 5000)
+DEFAULT_DATASET_DIRECTORY = os.path.join(
+    os.getcwd(), "dataTUM", "rgbd_dataset_freiburg1_360")
+DEFAULT_CAMERA_PARAMETERS = CameraParameters(
+    640, 480, 525, 525, 319.5, 239.5, 5000)
 
 MAX_DATA_POINT_AMOUNT = 50  # Use -1 if you want to use all the points
 
 # Image parameters
-STORE_ALL_IMAGES = True  # Whether to keep all the images in memory for displaying them in the video page (memory intensive)
+# Whether to keep all the images in memory for displaying them in the video page (memory intensive)
+STORE_ALL_IMAGES = True
 DRAW_KEYPOINTS_MATCHES = True  # Whether to render the keypoints and matches aswell
 
 # Pointcloud parameters
-POINTCLOUD_INCREMENT_AMOUNT = 1  # TODO Not usefull to take every pointCloud, reduce the amount
-MAX_POINTS_PER_CLOUD_RATIO = 0.01  # if equal to 1 it uses all the points, if equal 0.1 it uses 10% random points
+# TODO Not usefull to take every pointCloud, reduce the amount
+POINTCLOUD_INCREMENT_AMOUNT = 1
+# if equal to 1 it uses all the points, if equal 0.1 it uses 10% random points
+MAX_POINTS_PER_CLOUD_RATIO = 0.01
 
 # Algorithm parameters
 LOWES_RATIO_AMOUNT = 50  # For matching the keypoints
-KEYPOINT_FINDER = cv2.ORB_create(1000)
-MATCHING_ALG = cv2.BFMatcher(cv2.NORM_HAMMING)
+KEYPOINT_FINDER = cv2.ORB_create(nfeatures=1000)
+MATCHING_ALG = cv2.BFMatcher(cv2.NORM_HAMMING, crossCheck=True)
 
 # UI parameters
 HOME_PAGE_INDEX = 0

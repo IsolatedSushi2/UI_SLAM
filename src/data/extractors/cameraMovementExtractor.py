@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from src.data.dataReader import CameraLocations
+from src.camera import CameraLocations
 from src.data.extractors.pointCloudExtractor import PointCloudExtractor
 from pyquaternion import Quaternion
 

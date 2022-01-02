@@ -38,11 +38,16 @@ class Frame:
     def findKeypointsInImage(self, keypointFinder):
         kps, des = keypointFinder.detectAndCompute(self.rgbImage, None)
 
+        
         # We should remove the keypoints which don't have a depth associated with them with the PnP method
         # TODO This wouldnt be the case when using the essential matrix method
         kPoints = [keypoint.pt for keypoint in kps]
         roundedKpoints = [(int(round(x)), int(round(y))) for x, y in kPoints]
 
+        print(kPoints)
+        print(roundedKpoints)
+
+        exit()
         return kps, np.array(kPoints), des, np.array(roundedKpoints)
 
     def getRenderedImages(self):
@@ -60,14 +65,26 @@ class StereoFrame:
         self.matches, self.pts1, self.pts2 = self.getMatches(MATCHING_ALG)
 
     def getMatches(self, matcher):
+
+        m1 = np.float32(self.frame1.desc)
+        m2 = np.float32(self.frame2.desc)
+
+        print(m1)
+        print(m2)
+        
+        print(m1.shape)
+        print(m2.shape)
+
+        
         matches = matcher.match(self.frame1.desc, self.frame2.desc)
         matches = sorted(matches, key=lambda x: x.distance)
-
+        print(len(matches))
+        exit()
         # TODO Replace for loop by numpy
         pts1 = []
         pts2 = []
         returnMatches = []
-        # ratio test as per Lowe's paper
+
         for m in matches:
 
             if(len(returnMatches) >= LOWES_RATIO_AMOUNT):

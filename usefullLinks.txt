@@ -32,3 +32,6 @@ https://docs.opencv.org/3.4/d9/d0c/group__calib3d.html#ga549c2075fac14829ff4a58b
 implementation 
 https://avisingh599.github.io/vision/monocular-vo/
 https://github.com/uoip/monoVO-python/blob/master/visual_odometry.py
+
+Subset of keypoints AFTER detecting
+https://stackoverflow.com/questions/67622830/how-do-i-mask-opencvs-keypoints-post-detection

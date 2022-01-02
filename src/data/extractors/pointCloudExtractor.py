@@ -1,9 +1,10 @@
 from src.constants import MAX_POINTS_PER_CLOUD_RATIO
 import numpy as np
 
-
+# Contains useful functions for handling pointclouds
 class PointCloudExtractor:
 
+    # Translate the point cloud
     @staticmethod
     def translate_point_cloud(positions, colors, cameraLoc):
         translation = cameraLoc.translation

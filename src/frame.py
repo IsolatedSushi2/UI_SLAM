@@ -36,19 +36,18 @@ class Frame:
         del self.depthImage
 
     def findKeypointsInImage(self, keypointFinder):
+        # Find keypoints
         kps, des = keypointFinder.detectAndCompute(self.rgbImage, None)
 
-        
-        # We should remove the keypoints which don't have a depth associated with them with the PnP method
-        # TODO This wouldnt be the case when using the essential matrix method
-        kPoints = [keypoint.pt for keypoint in kps]
-        roundedKpoints = [(int(round(x)), int(round(y))) for x, y in kPoints]
+        # Get the points and rounded points (For indexing the depth map)
+        kPoints = np.array([keypoint.pt for keypoint in kps])
+        roundedKpoints = np.asarray(np.rint(kPoints), dtype=np.uint16)
 
-        print(kPoints)
-        print(roundedKpoints)
+        # Check which ones have a depth value associated
+        kpsDepthMask = self.depthImage[roundedKpoints[:, 1], roundedKpoints[:, 0]] != 0
 
-        exit()
-        return kps, np.array(kPoints), des, np.array(roundedKpoints)
+        # Return values with the depth mask
+        return np.array(kps)[kpsDepthMask], kPoints[kpsDepthMask], des[kpsDepthMask], roundedKpoints[kpsDepthMask]
 
     def getRenderedImages(self):
         rgbImage = cv2.drawKeypoints(
@@ -66,15 +65,8 @@ class StereoFrame:
 
     def getMatches(self, matcher):
 
-        m1 = np.float32(self.frame1.desc)
-        m2 = np.float32(self.frame2.desc)
-
-        print(m1)
-        print(m2)
-        
-        print(m1.shape)
-        print(m2.shape)
-
+        print(self.frame1.desc.shape)
+        print(self.frame2.desc.shape)
         
         matches = matcher.match(self.frame1.desc, self.frame2.desc)
         matches = sorted(matches, key=lambda x: x.distance)

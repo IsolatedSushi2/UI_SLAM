@@ -16,8 +16,7 @@ class TestSLAM(BaseSLAM):
         self.data.modeledCamLocs[firstTimeStamp] = self.data.trueCamLocs[firstTimeStamp]
         randomTrans = np.random.sample(3) / 100
 
-        randomquat = np.random.sample(4) / 10000000
-        print(randomquat)
+        randomquat = np.random.sample(4)
 
         for index, timeStamp in enumerate(self.data.timestamps[:-1]):
 
@@ -28,12 +27,11 @@ class TestSLAM(BaseSLAM):
 
             modelLocation.translation += np.log(index + 2) * randomTrans
 
-            r = R.from_quat(np.log(index + 2) * randomquat)
+            r = R.from_quat(np.sqrt(index+1) * randomquat)
             r = r.as_matrix()
 
             quat = Quaternion(matrix=r)
-            print(r)
-            modelLocation.quaternion = quat * location.quaternion 
+            modelLocation.quaternion = quat * location.quaternion
 
             self.data.modeledCamLocs[nextTimeStamp] = modelLocation
 

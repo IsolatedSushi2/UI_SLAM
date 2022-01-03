@@ -8,7 +8,7 @@ DEFAULT_DATASET_DIRECTORY = os.path.join(
 DEFAULT_CAMERA_PARAMETERS = CameraParameters(
     640, 480, 525, 525, 319.5, 239.5, 5000)
 
-MAX_DATA_POINT_AMOUNT = -1  # Use -1 if you want to use all the points
+MAX_DATA_POINT_AMOUNT = 40  # Use -1 if you want to use all the points
 
 # Image parameters
 # Whether to keep all the images in memory for displaying them in the video page (memory intensive)
@@ -31,3 +31,4 @@ HOME_PAGE_INDEX = 0
 VIDEO_PAGE_INDEX = 1
 POINT_CLOUD_PAGE_INDEX = 2
 CAMERA_PAGE_INDEX = 3
+CHARTS_PAGE_INDEX = 4

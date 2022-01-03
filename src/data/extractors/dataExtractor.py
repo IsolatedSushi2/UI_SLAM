@@ -58,9 +58,10 @@ class DataExtractor:
         frame = ImageExtractor.getFrame(
             timestamp, currRGBImage, currDepthImage, camParams)
 
-        indices = frame.getRoundedKeypointIndices()
+        roundedIndices = (
+            frame.roundedKeyPoints[:, 1]), (frame.roundedKeyPoints[:, 0])
         points, _, depthmask = PointCloudExtractor.generate_point_cloud_improved(
-            currRGBImage, currDepthImage, indices, camParams)
+            currRGBImage, currDepthImage, roundedIndices, camParams)
 
         frame.relativeKPSPointCloud = points
         cameraLoc = data.trueCamLocs[timestamp]

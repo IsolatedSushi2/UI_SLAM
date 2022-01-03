@@ -3,10 +3,8 @@ from vispy import scene
 from vispy.scene import visuals
 from colour import Color
 from pyquaternion import Quaternion
-from src.ui.rangeslider import QRangeSlider
 from PyQt5 import QtCore, QtGui, QtWidgets
 from vispy.visuals.transforms import STTransform
-
 
 class CameraPageHandler:
     def __init__(self, ui, dataObject):
@@ -15,12 +13,15 @@ class CameraPageHandler:
 
         self.createVispyWidget()
         self.addSceneVisuals()
-        self.createRangeSliderWidget(len(self.data.timestamps))
 
         self.trueCameras, self.trueDirections = self.getRenders(
             self.data.trueCamLocs)
         self.modeledCameras, self.modeledDirections = self.getRenders(
             self.data.modeledCamLocs)
+
+        self.ui.renderGroundTruthCheckBox.setChecked(True)
+        self.ui.renderModeledCheckBox.setChecked(True)
+
 
         self.ui.renderGroundTruthCheckBox.stateChanged.connect(
             self.setSceneVisualsData)
@@ -30,7 +31,7 @@ class CameraPageHandler:
     # Create the 3d vispy widget
     def createVispyWidget(self):
         self.canvas = scene.SceneCanvas(
-            keys='interactive', size=(600, 600), show=True, bgcolor='black')
+            keys='interactive', size=(600, 600), show=True, bgcolor=(28/255, 31/255, 36/255))
         self.ui.cameraRenderPlace.layout().addWidget(self.canvas.native)
 
         self.view = self.canvas.central_widget.add_view()
@@ -47,21 +48,6 @@ class CameraPageHandler:
         allPositions = [self.data.trueCamLocs[timestamp].translation
                         for timestamp in self.data.timestamps]
         return np.sum(allPositions, axis=0) / len(self.data.timestamps)
-
-    # Create the range slider widget
-
-    def createRangeSliderWidget(self, cameraAmount):
-        self.rangeSlider = QRangeSlider()
-
-        self.rangeSlider.setMaximumHeight(20)
-        self.rangeSlider.setMax(cameraAmount)
-        self.rangeSlider.setEnd(cameraAmount)
-
-        # When value change, update
-        self.rangeSlider.startValueChanged.connect(self.setSceneVisualsData)
-        self.rangeSlider.endValueChanged.connect(self.setSceneVisualsData)
-
-        self.ui.cameraRenderPlace.layout().addWidget(self.rangeSlider)
 
     # Get the camera location, including its translation and rotation
     def getRenders(self, cameraLocations):
@@ -120,9 +106,10 @@ class CameraPageHandler:
         self.modeledLines.set_data(np.empty((0, 3)), color=(1, 1, 1, 1))
 
     def getSlicedRenders(self, cams, directions, col1, col2):
-        currCameras = cams[self.rangeSlider.start(): self.rangeSlider.end()]
-        currDirections = directions[self.rangeSlider.start(
-        ) * 2: self.rangeSlider.end() * 2]
+        start = self.ui.start
+        end = self.ui.end
+        currCameras = cams[start: end]
+        currDirections = directions[start * 2: end * 2]
 
         pointColors = self.getColours(len(currCameras), col1, col2)
         lineColors = np.repeat(pointColors, 2, axis=0)
@@ -147,10 +134,10 @@ class CameraPageHandler:
         self.modeledLines.set_data(
             pos=currDirects, color=lineColors, connect="segments")
 
-    def setSceneVisualsData(self):
+    def setSceneVisualsData(self, newSelect = False):
         self.clearScreen()
 
-        amount = self.rangeSlider.end() - self.rangeSlider.start()
+        amount = self.ui.end - self.ui.start
         if amount <= 1:
             return
 

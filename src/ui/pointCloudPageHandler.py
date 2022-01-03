@@ -18,13 +18,14 @@ class PointCloudPageHandler:
         self.setupWidget()
         self.addSceneVisuals()
 
-        self.truePositions, self.trueColours = self.getRenders(self.data.truePointCloud.values())
+        self.truePositions, self.trueColours = self.getRenders(
+            self.data.truePointCloud.values())
         self.renderPoints()
 
     # Create the 3d vispy widget
     def setupWidget(self):
         self.canvas = scene.SceneCanvas(
-            keys='interactive', size=(600, 600), show=True, bgcolor='black', vsync=False)
+            keys='interactive', size=(600, 600), show=True, bgcolor=(28/255, 31/255, 36/255), vsync=False)
         self.ui.pointCloudPage.layout().addWidget(self.canvas.native)
 
         self.view = self.canvas.central_widget.add_view()
@@ -47,10 +48,13 @@ class PointCloudPageHandler:
     def getRenders(self, pointClouds):
         truePos, trueColors = zip(*pointClouds)
 
-        return np.concatenate(truePos), np.concatenate(trueColors)
+        return np.concatenate(truePos[self.ui.start: self.ui.end]), np.concatenate(trueColors[self.ui.start: self.ui.end])
 
     def renderPoints(self):
         self.scatter.set_data(pos=self.truePositions, edge_width=0,
                               face_color=self.trueColours, size=1, scaling=False)
 
-        print("Rendered",len(self.truePositions),"points!")
+    def setSceneVisualsData(self, newSelect = False):
+        self.truePositions, self.trueColours = self.getRenders(
+            self.data.truePointCloud.values())
+        self.renderPoints()

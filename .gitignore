@@ -129,4 +129,4 @@ dmypy.json
 .pyre/
 
 #Ignore the data files
-dataTUM/
+dataTUM/bigData

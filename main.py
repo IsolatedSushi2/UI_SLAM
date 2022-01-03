@@ -1,9 +1,6 @@
 from src.ui.ui import Ui_MainWindow
-
 from src.ui.slamwindow import SLAMWindow
-
 from PyQt5 import QtCore, QtGui, QtWidgets
-
 import sys
 
 

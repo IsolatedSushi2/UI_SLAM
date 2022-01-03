@@ -17,10 +17,6 @@ class Frame:
 
         self.relativeKPSPointCloud = None
 
-    def getRoundedKeypointIndices(self):
-        v, u = zip(*self.roundedKeyPoints)
-        return np.array(u, np.uint16), np.array(v, np.uint16)
-
     def clearImagesFromMemory(self):
         del self.rgbImage
         del self.depthImage

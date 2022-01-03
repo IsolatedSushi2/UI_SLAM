@@ -8,7 +8,7 @@ from src.camera import CameraParameters
 from src.constants import DEFAULT_DATASET_DIRECTORY, DEFAULT_CAMERA_PARAMETERS
 from src.constants import VIDEO_PAGE_INDEX, POINT_CLOUD_PAGE_INDEX, CAMERA_PAGE_INDEX, CHARTS_PAGE_INDEX
 from src.ui.rangeslider import QRangeSlider
-
+from PyQt5.QtWidgets import QFileDialog
 
 class SLAMWindow:
     def __init__(self, ui):
@@ -39,9 +39,20 @@ class SLAMWindow:
         self.ui.chartButton.clicked.connect(
             lambda: self.setMainStackedPage(CHARTS_PAGE_INDEX))
 
+
         # Loading in the default dataset
         self.ui.uploadDefaultDatasetButton.clicked.connect(
             self.loadDefaultDirectory)
+        self.ui.uploadDatasetButton.clicked.connect(
+            self.selectDataDirectory)
+
+    def selectDataDirectory(self):
+        path = str(QFileDialog.getExistingDirectory(None, "Select Directory"))
+
+        if path == "":
+            return
+
+        self.loadDirectory(path)
 
     # Load in a default dataset
 

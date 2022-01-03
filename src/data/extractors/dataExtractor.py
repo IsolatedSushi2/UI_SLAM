@@ -4,9 +4,8 @@ from src.data.extractors.imageExtractor import ImageExtractor
 from src.constants import POINTCLOUD_INCREMENT_AMOUNT, MAX_POINTS_PER_CLOUD_RATIO
 from src.slamAlgorithms.testSLAM import TestSLAM
 
-import time
 
-
+# Extracts the images in a memory efficient way
 class DataExtractor:
 
     # Load the directory
@@ -22,7 +21,7 @@ class DataExtractor:
         data = SLAMAlgorithm.extractCameraMovement()
         return data
 
-    # Extract the stereoframe
+    # Extract the stereoframes
     @staticmethod
     def getStereoFrames(data):
         for index in range(len(data.frames) - 1):
@@ -54,10 +53,12 @@ class DataExtractor:
 
     @staticmethod
     def extractFrameAndPC(data, timestamp, camParams, renderPointCloud):
+        # Get the frame
         (currRGBImage, currDepthImage) = DataReader.getImagePair(data, timestamp)
         frame = ImageExtractor.getFrame(
             timestamp, currRGBImage, currDepthImage, camParams)
 
+        # Get the pointCloud
         roundedIndices = (
             frame.roundedKeyPoints[:, 1]), (frame.roundedKeyPoints[:, 0])
         points, _, depthmask = PointCloudExtractor.generate_point_cloud_improved(

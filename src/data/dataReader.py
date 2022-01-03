@@ -6,6 +6,7 @@ from src.constants import MAX_DATA_POINT_AMOUNT
 from src.associate import read_file_list, associate
 from src.camera import CameraLocations
 
+
 # Main dataObject
 class Data:
     def __init__(self):

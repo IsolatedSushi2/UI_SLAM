@@ -5,6 +5,9 @@ from src.camera import CameraLocations
 from src.data.extractors.pointCloudExtractor import PointCloudExtractor
 from pyquaternion import Quaternion
 #  Simple SLAM algorithm (one relative constraint per stereoFrame)
+#  For now it uses the camera's true position in orde to find the location one frame ahead
+#  Note that it is a very simple example! More complicated algorithms are required for better results
+#  This project was about the framework instead of the development of state of the arts algorithms
 
 
 class ExampleSLAM(BaseSLAM):
@@ -19,8 +22,8 @@ class ExampleSLAM(BaseSLAM):
         self.data.modeledCamLocs[firstTimeStamp] = CameraLocations(
         ).createFromValues(firstLoc.translation, firstLoc.quaternion)
 
+        # Calculate locations
         self.data = self.calculateCameraLocations()
-        self.printAllResults(10)
 
         return self.data
 
@@ -36,14 +39,14 @@ class ExampleSLAM(BaseSLAM):
 
             stereoFrame = self.data.stereoFrames[timeStamp]
 
+            # Calculate real positions in world space
             relativePositions3D = stereoFrame.frame1KPS
-
             positions3D, _ = PointCloudExtractor.translate_point_cloud(
                 relativePositions3D, None, trueCurrLocation)
-            # positions3D, _ = PointCloudExtractor.translate_point_cloud(
-            #     relativePositions3D, None, modeledLocation)
 
-            cameraLoc = self.getCameraLocationPNP(positions3D, stereoFrame.pts2, stereoFrame.K)
+            # Find the cameras position
+            cameraLoc = self.getCameraLocationPNP(
+                positions3D, stereoFrame.pts2, stereoFrame.K)
             self.data.modeledCamLocs[nextTimeStamp] = cameraLoc
 
         return self.data
@@ -60,16 +63,22 @@ class ExampleSLAM(BaseSLAM):
         print(trueLoc.translation, modeledLoc.translation)
 
     def getCameraLocationPNP(self, points3D, points2D, cameraMatrix):
-        succes, rVector, rTrans, inLiers = cv2.solvePnPRansac(
-            points3D, points2D, cameraMatrix, None)
 
-        assert succes is True
+        if len(points3D) <= 10:
+            return None
+
+        succes, rVector, rTrans, inLiers = cv2.solvePnPRansac(
+            points3D, points2D, cameraMatrix, None, confidence=0.999)
+
+        if not succes:
+            return None
 
         # Get the camera position and location in world space
         cameraRotation = cv2.Rodrigues(rVector)[0].T
-        cameraTranslation = np.array(-np.matrix(cameraRotation) * np.matrix(rTrans))
+        cameraTranslation = np.array(-np.matrix(cameraRotation)
+                                     * np.matrix(rTrans))
 
-        # TODO, simplify this
+        # TODO, simplify this (for some reason dtype=float didnt work)
         cameraTranslation = np.array([float(cameraTranslation[0]), float(
             cameraTranslation[1]), float(cameraTranslation[2])])
 

@@ -49,7 +49,7 @@ class SLAMWindow:
         self.ui.notificationLabel.setText("Loaded dataset: {}".format(path))
 
         self.videoPageHandler = VideoPageHandler(self.ui, self.data)
-        #self.pointCloudPageHandler = PointCloudPageHandler(self.ui, self.data)
+        self.pointCloudPageHandler = PointCloudPageHandler(self.ui, self.data)
         self.cameraPageHandler = CameraPageHandler(self.ui, self.data)
 
     # Change the stackedWidget index

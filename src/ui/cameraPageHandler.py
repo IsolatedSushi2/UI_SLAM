@@ -5,6 +5,7 @@ from colour import Color
 from pyquaternion import Quaternion
 from src.ui.rangeslider import QRangeSlider
 from PyQt5 import QtCore, QtGui, QtWidgets
+from vispy.visuals.transforms import STTransform
 
 
 class CameraPageHandler:
@@ -16,15 +17,15 @@ class CameraPageHandler:
         self.addSceneVisuals()
         self.createRangeSliderWidget(len(self.data.timestamps))
 
-        self.trueCameras, self.trueDirections = self.getRenders(self.data.trueCamLocs)
-        self.modeledCameras, self.modeledDirections = self.getRenders(self.data.modeledCamLocs)
+        self.trueCameras, self.trueDirections = self.getRenders(
+            self.data.trueCamLocs)
+        self.modeledCameras, self.modeledDirections = self.getRenders(
+            self.data.modeledCamLocs)
 
-
-        self.ui.renderGroundTruthCheckBox.stateChanged.connect(self.setSceneVisualsData)
-        self.ui.renderModeledCheckBox.stateChanged.connect(self.setSceneVisualsData)
-
-
-        self.setSceneVisualsData()
+        self.ui.renderGroundTruthCheckBox.stateChanged.connect(
+            self.setSceneVisualsData)
+        self.ui.renderModeledCheckBox.stateChanged.connect(
+            self.setSceneVisualsData)
 
     # Create the 3d vispy widget
     def createVispyWidget(self):
@@ -36,7 +37,19 @@ class CameraPageHandler:
 
         self.view.camera = 'turntable'  # scene.cameras.FlyCamera()  # or try 'arcball'
 
+        s = STTransform(translate=(500, 500, 200), scale=(50, 50, 50, 1))
+
+        centerOfMass = self.getCenterOfMass()
+        self.view.camera.center = tuple(centerOfMass)
+        self.view.camera.update()
+
+    def getCenterOfMass(self):
+        allPositions = [self.data.trueCamLocs[timestamp].translation
+                        for timestamp in self.data.timestamps]
+        return np.sum(allPositions, axis=0) / len(self.data.timestamps)
+
     # Create the range slider widget
+
     def createRangeSliderWidget(self, cameraAmount):
         self.rangeSlider = QRangeSlider()
 
@@ -59,6 +72,8 @@ class CameraPageHandler:
         for timestamps in self.data.timestamps[:-1]:
             currCamera = cameraLocations[timestamps]
 
+            if not currCamera:
+                continue
             # Use the forward vector (Unity mindset) to get a point which the camera is directed to
             rotated = currCamera.quaternion.rotate(np.array([0, 0, 0.04]))
 
@@ -106,7 +121,8 @@ class CameraPageHandler:
 
     def getSlicedRenders(self, cams, directions, col1, col2):
         currCameras = cams[self.rangeSlider.start(): self.rangeSlider.end()]
-        currDirections = directions[self.rangeSlider.start() * 2: self.rangeSlider.end() * 2]
+        currDirections = directions[self.rangeSlider.start(
+        ) * 2: self.rangeSlider.end() * 2]
 
         pointColors = self.getColours(len(currCameras), col1, col2)
         lineColors = np.repeat(pointColors, 2, axis=0)
@@ -114,32 +130,33 @@ class CameraPageHandler:
         return currCameras, currDirections, pointColors, lineColors
 
     def renderTrueCameras(self):
-        trueData = self.getSlicedRenders(self.trueCameras, self.trueDirections, 'yellow', 'green')
+        trueData = self.getSlicedRenders(
+            self.trueCameras, self.trueDirections, 'blue', 'purple')
         currCams, currDirects, pointColors, lineColors = trueData
-        print(currCams[0])
-        print(currCams.shape)
         self.trueScatter.set_data(currCams, edge_color=None,
-                                face_color=pointColors, size=10, scaling=False)
-        self.trueLines.set_data(pos=currDirects, color=lineColors, connect="segments")
+                                  face_color=pointColors, size=10, scaling=False)
+        self.trueLines.set_data(
+            pos=currDirects, color=lineColors, connect="segments")
 
     def renderModeledCameras(self):
-        modeledData = self.getSlicedRenders(self.modeledCameras, self.modeledDirections, 'blue', 'red')
+        modeledData = self.getSlicedRenders(
+            self.modeledCameras, self.modeledDirections, 'yellow', 'green')
         currCams, currDirects, pointColors, lineColors = modeledData
-        print(currCams[0])
-        print(currCams.shape)
-        print(currCams[0].shape)
         self.modeledScatter.set_data(currCams, edge_color=None,
-                                face_color=pointColors, size=10, scaling=False)
-        self.modeledLines.set_data(pos=currDirects, color=lineColors, connect="segments")
+                                     face_color=pointColors, size=10, scaling=False)
+        self.modeledLines.set_data(
+            pos=currDirects, color=lineColors, connect="segments")
 
     def setSceneVisualsData(self):
-        # Slice the selected cameras according to the rangeslider
-
         self.clearScreen()
+
+        amount = self.rangeSlider.end() - self.rangeSlider.start()
+        if amount <= 1:
+            return
 
         if self.ui.renderGroundTruthCheckBox.isChecked():
             self.renderTrueCameras()
-        
+
         if self.ui.renderModeledCheckBox.isChecked():
             self.renderModeledCameras()
             pass

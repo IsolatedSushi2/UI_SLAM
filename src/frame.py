@@ -69,6 +69,8 @@ class StereoFrame:
         self.frame1 = frame1
         self.frame2 = frame2
 
+        self.camParams = self.frame1.camParams
+
         self.frame1KPS = None
         self.frame2KPS = None
 

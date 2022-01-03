@@ -11,7 +11,6 @@ class CameraParameters:
         self.width = width
         self.height = height
         self.depthScalingFactor = depthScalingFactor
-
         self.K = self.getKMatrix()
         print("Camera Matrix:\n", self.K)
 
@@ -30,6 +29,11 @@ class CameraLocations:
         self.translation = translation
         self.quaternion = quaternion
 
+        return self
+
+    def createFromCameraLoc(self, loc):
+        self.translation = loc.translation
+        self.quaternion = loc.quaternion
         return self
 
     def createFromText(self, data):

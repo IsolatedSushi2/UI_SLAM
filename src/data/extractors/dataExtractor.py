@@ -2,13 +2,14 @@ from src.data.dataReader import DataReader
 from src.data.extractors.pointCloudExtractor import PointCloudExtractor
 from src.data.extractors.imageExtractor import ImageExtractor
 from src.constants import POINTCLOUD_INCREMENT_AMOUNT, MAX_POINTS_PER_CLOUD_RATIO
-from src.slamAlgorithms.exampleSLAM import ExampleSLAM
+from src.slamAlgorithms.testSLAM import TestSLAM
 
 import time
 
 
 class DataExtractor:
 
+    # Load the directory
     @staticmethod
     def loadDirectory(path, camParams):
         data = DataReader.loadTextFiles(path)
@@ -17,10 +18,11 @@ class DataExtractor:
         print("Extracted all Frames")
         data = DataExtractor.getStereoFrames(data)
         print("Extracted all StereoFrames")
-        SLAMAlgorithm = ExampleSLAM(data)
+        SLAMAlgorithm = TestSLAM(data)
         data = SLAMAlgorithm.extractCameraMovement()
         return data
 
+    # Extract the stereoframe
     @staticmethod
     def getStereoFrames(data):
         for index in range(len(data.frames) - 1):
@@ -63,6 +65,8 @@ class DataExtractor:
         frame.relativeKPSPointCloud = points
         cameraLoc = data.trueCamLocs[timestamp]
         pointCloud = None
+
+        # If rendering the point cloud, we need to store it
         if renderPointCloud:
             indices = PointCloudExtractor.getSamplePointsIndices(
                 data.imgWidth, data.imgHeight, MAX_POINTS_PER_CLOUD_RATIO)

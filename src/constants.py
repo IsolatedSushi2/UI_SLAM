@@ -12,7 +12,7 @@ MAX_DATA_POINT_AMOUNT = -1  # Use -1 if you want to use all the points
 
 # Image parameters
 # Whether to keep all the images in memory for displaying them in the video page (memory intensive)
-STORE_ALL_IMAGES = True
+STORE_ALL_IMAGES = False
 DRAW_KEYPOINTS_MATCHES = True  # Whether to render the keypoints and matches aswell
 
 # Pointcloud parameters

@@ -6,11 +6,11 @@ class Metrics:
 
     # Get the error between the ground truth and modeled positions
     @staticmethod
-    def getPosErrorPerStep(data, timestamps):
+    def getPosErrorPerStep(data):
 
         allDistances = []
 
-        for index, timestamp in enumerate(timestamps):
+        for index, timestamp in enumerate(data.timestamps):
 
             modeledPos = data.modeledCamLocs[timestamp].translation
             truePos = data.trueCamLocs[timestamp].translation
@@ -23,11 +23,11 @@ class Metrics:
 
     # Get the amount of keypoints per timestamp
     @staticmethod
-    def getKeyPointAmountPerStep(data, timestamps):
+    def getKeyPointAmountPerStep(data):
 
         keypointAmounts = []
 
-        for index, timestamp in enumerate(timestamps):
+        for index, timestamp in enumerate(data.timestamps):
 
             currFrame = data.frames[timestamp]
             keypointAmount = len(currFrame.keypoints)
@@ -37,11 +37,11 @@ class Metrics:
 
     # Get the cosine similarity error of the rotation matrices
     @staticmethod
-    def getRotationErrorPerStep(data, timestamps):
+    def getRotationErrorPerStep(data):
 
         allRotErrors = []
 
-        for index, timestamp in enumerate(timestamps):
+        for index, timestamp in enumerate(data.timestamps):
 
             modeledQuat = data.modeledCamLocs[timestamp].quaternion
             trueQuat = data.trueCamLocs[timestamp].quaternion
@@ -61,14 +61,14 @@ class Metrics:
 
     # Get the velocity per step
     @staticmethod
-    def getVelocityPerStep(data, timestamps):
+    def getVelocityPerStep(data):
 
         trueVelocities = []
         modeledVelocities = []
 
-        for index in range(len(timestamps) - 1):
-            currTimestamp = timestamps[index]
-            nextTimestamp = timestamps[index + 1]
+        for index in range(len(data.timestamps) - 1):
+            currTimestamp = data.timestamps[index]
+            nextTimestamp = data.timestamps[index + 1]
 
             currmodeledPos = data.modeledCamLocs[currTimestamp].translation
             currtruePos = data.trueCamLocs[currTimestamp].translation

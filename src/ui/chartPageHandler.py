@@ -41,49 +41,58 @@ class ChartPageHandler():
         self.ui.chart3Frame.layout().addWidget(self.velocityChart.native)
         self.ui.chart4Frame.layout().addWidget(self.keyAmountChart.native)
 
-    # Position error
-    def setPosErrorChart(self, selectedTimestamps):
-        allDistances = Metrics.getPosErrorPerStep(
-            self.data, selectedTimestamps)
+        # Get the metrics data
+        self.getMetrics()
 
-        self.posErrorline.set_data(allDistances)
+    # Position error
+    def updatePosErrorChart(self):
+        selDistances = self.posError[self.ui.start: self.ui.end]
+
+        self.posErrorline.set_data(selDistances)
         self.posErrorChart.vb.camera.set_range(
-            (0, len(selectedTimestamps), (0, 1)))
+            (0, len(selDistances), (0, 1)))
 
     # Velocities per stamps
-    def setVelocityChart(self, selectedTimestamps):
-        modelVel, trueVel = Metrics.getVelocityPerStep(
-            self.data, selectedTimestamps)
+    def updateVelocityChart(self):
+        selModelVel = self.modelVel[self.ui.start: self.ui.end]
+        selTrueVel = self.trueVel[self.ui.start: self.ui.end]
 
-        self.modelVelline.set_data(modelVel)
-        self.trueVelline.set_data(trueVel)
+        self.modelVelline.set_data(selModelVel)
+        self.trueVelline.set_data(selTrueVel)
         self.velocityChart.vb.camera.set_range(
-            (0, len(selectedTimestamps), (0, 1)))
+            (0, len(selTrueVel), (0, 1)))
 
     # Number of keypoints
-    def setKeyPointAmountChart(self, selectedTimestamps):
-        keypointAmounts = Metrics.getKeyPointAmountPerStep(
-            self.data, selectedTimestamps)
+    def updateKeyPointAmountChart(self):
+        selKPAmount = self.keypointAmounts[self.ui.start: self.ui.end]
 
-        self.keyAmountline.set_data(keypointAmounts)
+        self.keyAmountline.set_data(selKPAmount)
         self.keyAmountChart.vb.camera.set_range(
-            (0, len(selectedTimestamps), (0, 1)))
+            (0, len(selKPAmount), (0, 1)))
 
     # Rotation error
-    def setRotErrorChart(self, selectedTimestamps):
-        allRotErrors = Metrics.getRotationErrorPerStep(
-            self.data, selectedTimestamps)
-        self.rotErrorline.set_data(allRotErrors)
+    def updateRotErrorChart(self):
+        selRotErrors = self.rotErrors[self.ui.start: self.ui.end]
+        self.rotErrorline.set_data(selRotErrors)
         self.rotErrorChart.vb.camera.set_range(
-            (0, len(selectedTimestamps), (0, 1)))
+            (0, len(selRotErrors), (0, 1)))
 
-    # Get all the charts
+    # Get all the metrics
     def getMetrics(self):
-        selectedTimestamps = self.data.timestamps[self.ui.start: self.ui.end]
-        self.setPosErrorChart(selectedTimestamps)
-        self.setVelocityChart(selectedTimestamps)
-        self.setKeyPointAmountChart(selectedTimestamps)
-        self.setRotErrorChart(selectedTimestamps)
+        self.posError = Metrics.getPosErrorPerStep(
+            self.data)
+        self.modelVel, self.trueVel = Metrics.getVelocityPerStep(
+            self.data)
+        self.keypointAmounts = Metrics.getKeyPointAmountPerStep(
+            self.data)
+        self.rotErrors = Metrics.getRotationErrorPerStep(
+            self.data)
+
+    def updateCharts(self):
+        self.updatePosErrorChart()
+        self.updateVelocityChart()
+        self.updateKeyPointAmountChart()
+        self.updateRotErrorChart()
 
     # Connection point from the main screen
     def setSceneVisualsData(self, newSelect=False):
@@ -91,7 +100,7 @@ class ChartPageHandler():
         if amount <= 1:
             return
 
-        self.getMetrics()
+        self.updateCharts()
 
 
 class CustomPlot(scene.SceneCanvas):

@@ -82,7 +82,7 @@ class ChartPageHandler():
         selectedTimestamps = self.data.timestamps[self.ui.start: self.ui.end]
         self.setPosErrorChart(selectedTimestamps)
         self.setVelocityChart(selectedTimestamps)
-        self.setKeyMatchAmountChart(selectedTimestamps)
+        self.setKeyPointAmountChart(selectedTimestamps)
         self.setRotErrorChart(selectedTimestamps)
 
     # Connection point from the main screen

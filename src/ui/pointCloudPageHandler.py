@@ -7,6 +7,7 @@ from pyquaternion import Quaternion
 from src.constants import MAX_POINTS_PER_CLOUD_RATIO, POINT_CLOUD_PAGE_INDEX
 
 
+# Handles the pointcloud page
 class PointCloudPageHandler:
     def __init__(self, ui, dataObject):
         self.ui = ui
@@ -45,16 +46,18 @@ class PointCloudPageHandler:
         # add a colored 3D axis for orientation
         self.axis = visuals.XYZAxis(parent=self.view.scene)
 
+    # Get the indiced renders
     def getRenders(self, pointClouds):
         truePos, trueColors = zip(*pointClouds)
 
         return np.concatenate(truePos[self.ui.start: self.ui.end]), np.concatenate(trueColors[self.ui.start: self.ui.end])
 
+    # Render the pointclouds
     def renderPoints(self):
         self.scatter.set_data(pos=self.truePositions, edge_width=0,
                               face_color=self.trueColours, size=1, scaling=False)
 
-    def setSceneVisualsData(self, newSelect = False):
+    def setSceneVisualsData(self, newSelect=False):
         self.truePositions, self.trueColours = self.getRenders(
             self.data.truePointCloud.values())
         self.renderPoints()

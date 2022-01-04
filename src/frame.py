@@ -93,9 +93,11 @@ class StereoFrame:
 
         return matches, pts1, pts2
 
+    # Not used in the PnP method
     def getFundamentalMatrix(self):
         return cv2.findFundamentalMat(self.pts1, self.pts2, cv2.FM_LMEDS)
 
+    # Not used in the PnP method
     def getEssentialMatrix(self):
         F, _ = self.getFundamentalMatrix()
         K = self.frame1.camParams.getKMatrix()
@@ -116,9 +118,3 @@ class StereoFrame:
         depthImages = np.hstack((depthimg1, depthimg2))
 
         return rgbImages, depthImages
-
-    # Can be removed
-    def show(self, drawKeypoints=True):
-        img = self.getRenderedImage(drawKeypoints)
-        cv2.imshow("StereoFrame", img)
-        cv2.waitKey(0)

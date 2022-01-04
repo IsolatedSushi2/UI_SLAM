@@ -20,11 +20,13 @@ class CameraParameters:
                             [0, 0, 1]])
 
 
+# Store the camera location
 class CameraLocations:
     def __init__(self):
         self.translation = None
         self.quaternion = None
 
+    # Is this the way to do this? Since there is no function overloading
     def createFromValues(self, translation, quaternion):
         self.translation = translation
         self.quaternion = quaternion

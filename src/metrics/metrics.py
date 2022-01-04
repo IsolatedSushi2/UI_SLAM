@@ -23,7 +23,7 @@ class Metrics:
 
     # Get the amount of keypoints per timestamp
     @staticmethod
-    def getKeyMatchAmountPerStep(data, timestamps):
+    def getKeyPointAmountPerStep(data, timestamps):
 
         keypointAmounts = []
 

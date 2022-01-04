@@ -10,6 +10,8 @@ from src.constants import VIDEO_PAGE_INDEX, POINT_CLOUD_PAGE_INDEX, CAMERA_PAGE_
 from src.ui.rangeslider import QRangeSlider
 from PyQt5.QtWidgets import QFileDialog
 
+
+# Acts as the "mainwindow"
 class SLAMWindow:
     def __init__(self, ui):
         self.ui = ui
@@ -17,15 +19,14 @@ class SLAMWindow:
 
         self.createRangeSliderWidget()
         self.connectLeftFrameButtons()
-    # Create the range slider widget
 
+    # Create the range slider widget
     def createRangeSliderWidget(self):
         self.rangeSlider = QRangeSlider()
         self.rangeSlider.setMaximumHeight(20)
         self.ui.rangeSliderBar.layout().addWidget(self.rangeSlider)
 
     # To make the buttons in the left menu work
-
     def connectLeftFrameButtons(self):
         # For changing the stackedwidget index
 
@@ -38,7 +39,6 @@ class SLAMWindow:
             lambda: self.setMainStackedPage(CAMERA_PAGE_INDEX))
         self.ui.chartButton.clicked.connect(
             lambda: self.setMainStackedPage(CHARTS_PAGE_INDEX))
-
 
         # Loading in the default dataset
         self.ui.uploadDefaultDatasetButton.clicked.connect(
@@ -55,7 +55,6 @@ class SLAMWindow:
         self.loadDirectory(path)
 
     # Load in a default dataset
-
     def loadDefaultDirectory(self):
         if(self.data):
             return
@@ -63,7 +62,6 @@ class SLAMWindow:
         self.loadDirectory(DEFAULT_DATASET_DIRECTORY)
 
     # Load in the data, and setup the widgets
-
     def loadDirectory(self, path):
 
         self.data = DataExtractor.loadDirectory(
@@ -86,6 +84,7 @@ class SLAMWindow:
         self.connectRangeSlider(len(self.data.timestamps))
         self.updateRangeSlider()
 
+    # Setup the range slider
     def connectRangeSlider(self, cameraAmount):
         self.rangeSlider.setMin(0)
         self.rangeSlider.setMax(cameraAmount)
@@ -96,6 +95,7 @@ class SLAMWindow:
         self.rangeSlider.startValueChanged.connect(self.updateRangeSlider)
         self.rangeSlider.endValueChanged.connect(self.updateRangeSlider)
 
+    # When the rangeSlider value changes
     def updateRangeSlider(self):
         start = self.rangeSlider.start()
         end = self.rangeSlider.end()
@@ -113,7 +113,6 @@ class SLAMWindow:
             currPage.setSceneVisualsData(newSelect)
 
     # Change the stackedWidget index
-
     def setMainStackedPage(self, index):
         if not self.data:
             print("Load in data first")

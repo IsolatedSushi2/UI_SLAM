@@ -6,6 +6,7 @@ from pyquaternion import Quaternion
 from PyQt5 import QtCore, QtGui, QtWidgets
 from vispy.visuals.transforms import STTransform
 
+
 # Handles the rendering of the camera positions
 class CameraPageHandler:
     def __init__(self, ui, dataObject):
@@ -29,7 +30,7 @@ class CameraPageHandler:
         self.ui.renderModeledCheckBox.stateChanged.connect(
             self.setSceneVisualsData)
 
-    # Create the 3d vispy widget
+    # Create the 3d vispy widget and setup the camera
     def createVispyWidget(self):
         self.canvas = scene.SceneCanvas(
             keys='interactive', size=(600, 600), show=True, bgcolor=(28 / 255, 31 / 255, 36 / 255))
@@ -57,15 +58,16 @@ class CameraPageHandler:
         cameras = []
         lines = []
 
-        # TODO THE INDEXING
         for timestamps in self.data.timestamps[:-1]:
             currCamera = cameraLocations[timestamps]
 
             if not currCamera:
                 continue
+
             # Use the forward vector (Unity mindset) to get a point which the camera is directed to
             rotated = currCamera.quaternion.rotate(np.array([0, 0, 0.04]))
 
+            # Add the data
             cameras.append(currCamera.translation)
             lines.append(currCamera.translation)
             lines.append(currCamera.translation + rotated)
@@ -99,6 +101,7 @@ class CameraPageHandler:
         # add a colored 3D axis for orientation
         self.axis = visuals.XYZAxis(parent=self.view.scene)
 
+    # Clear the screen before handling the checkbox
     def clearScreen(self):
         emptyData = np.empty((0, 3))
 
@@ -108,6 +111,7 @@ class CameraPageHandler:
         self.trueLines.set_data(np.empty((0, 3)), color=(1, 1, 1, 1))
         self.modeledLines.set_data(np.empty((0, 3)), color=(1, 1, 1, 1))
 
+    # Connect the rangeslider
     def getSlicedRenders(self, cams, directions, col1, col2):
         start = self.ui.start
         end = self.ui.end
@@ -119,6 +123,7 @@ class CameraPageHandler:
 
         return currCameras, currDirections, pointColors, lineColors
 
+    # Rendering the true cameras
     def renderTrueCameras(self):
         trueData = self.getSlicedRenders(
             self.trueCameras, self.trueDirections, 'blue', 'purple')
@@ -128,6 +133,7 @@ class CameraPageHandler:
         self.trueLines.set_data(
             pos=currDirects, color=lineColors, connect="segments")
 
+    # Rendering the modeled cameras
     def renderModeledCameras(self):
         modeledData = self.getSlicedRenders(
             self.modeledCameras, self.modeledDirections, 'yellow', 'green')
@@ -137,6 +143,7 @@ class CameraPageHandler:
         self.modeledLines.set_data(
             pos=currDirects, color=lineColors, connect="segments")
 
+    # Connection point from the main screen
     def setSceneVisualsData(self, newSelect=False):
         self.clearScreen()
         amount = self.ui.end - self.ui.start

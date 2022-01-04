@@ -13,6 +13,7 @@ class ChartPageHandler():
         self.data = dataObject
         self.createCharts()
 
+    # Create all the charts, not really worth simplifying this function
     def createCharts(self):
         bgColor = (28 / 255, 31 / 255, 36 / 255)
 
@@ -40,6 +41,7 @@ class ChartPageHandler():
         self.ui.chart3Frame.layout().addWidget(self.velocityChart.native)
         self.ui.chart4Frame.layout().addWidget(self.keyAmountChart.native)
 
+    # Position error
     def setPosErrorChart(self, selectedTimestamps):
         allDistances = Metrics.getPosErrorPerStep(
             self.data, selectedTimestamps)
@@ -48,6 +50,7 @@ class ChartPageHandler():
         self.posErrorChart.vb.camera.set_range(
             (0, len(selectedTimestamps), (0, 1)))
 
+    # Velocities per stamps
     def setVelocityChart(self, selectedTimestamps):
         modelVel, trueVel = Metrics.getVelocityPerStep(
             self.data, selectedTimestamps)
@@ -57,14 +60,16 @@ class ChartPageHandler():
         self.velocityChart.vb.camera.set_range(
             (0, len(selectedTimestamps), (0, 1)))
 
-    def setKeyMatchAmountChart(self, selectedTimestamps):
-        keypointAmounts = Metrics.getKeyMatchAmountPerStep(
+    # Number of keypoints
+    def setKeyPointAmountChart(self, selectedTimestamps):
+        keypointAmounts = Metrics.getKeyPointAmountPerStep(
             self.data, selectedTimestamps)
 
         self.keyAmountline.set_data(keypointAmounts)
         self.keyAmountChart.vb.camera.set_range(
             (0, len(selectedTimestamps), (0, 1)))
 
+    # Rotation error
     def setRotErrorChart(self, selectedTimestamps):
         allRotErrors = Metrics.getRotationErrorPerStep(
             self.data, selectedTimestamps)
@@ -72,6 +77,7 @@ class ChartPageHandler():
         self.rotErrorChart.vb.camera.set_range(
             (0, len(selectedTimestamps), (0, 1)))
 
+    # Get all the charts
     def getMetrics(self):
         selectedTimestamps = self.data.timestamps[self.ui.start: self.ui.end]
         self.setPosErrorChart(selectedTimestamps)
@@ -79,6 +85,7 @@ class ChartPageHandler():
         self.setKeyMatchAmountChart(selectedTimestamps)
         self.setRotErrorChart(selectedTimestamps)
 
+    # Connection point from the main screen
     def setSceneVisualsData(self, newSelect=False):
         amount = self.ui.end - self.ui.start
         if amount <= 1:
@@ -97,14 +104,15 @@ class CustomPlot(scene.SceneCanvas):
         self.grid = self.central_widget.add_grid(spacing=0)
         self.vb = self.grid.add_view(row=0, col=1, camera='panzoom')
 
+        axisColor = (98 / 255, 103 / 255, 111 / 255)
         self.x_axis = scene.AxisWidget(
-            orientation='bottom', axis_color=(98/255, 103/255, 111/255))
+            orientation='bottom', axis_color=axisColor)
         self.x_axis.stretch = (1, 0.1)
         self.grid.add_widget(self.x_axis, row=1, col=1)
         self.x_axis.link_view(self.vb)
 
         self.y_axis = scene.AxisWidget(
-            orientation='left', axis_color=(98/255, 103/255, 111/255))
+            orientation='left', axis_color=axisColor)
         self.y_axis.stretch = (0.1, 1)
         self.grid.add_widget(self.y_axis, row=0, col=0)
         self.y_axis.link_view(self.vb)

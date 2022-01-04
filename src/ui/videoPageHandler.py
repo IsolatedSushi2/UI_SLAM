@@ -6,6 +6,8 @@ import numpy as np
 from src.constants import VIDEO_PAGE_INDEX, STORE_ALL_IMAGES
 from src.frame import Frame, StereoFrame
 
+
+# Handles the video page
 class VideoPageHandler:
     def __init__(self, ui, dataObject):
         self.ui = ui
@@ -22,8 +24,10 @@ class VideoPageHandler:
 
     # Go trough the images
     def RenderImages(self, renderedStereoRGB, renderedStereoDepth):
-        currRGBPixMap = self.cv2ToQPixmap(renderedStereoRGB, QImage.Format_RGB888)
-        currDepthPixMap = self.cv2ToQPixmap(np.array(renderedStereoDepth, dtype=np.uint16), QImage.Format_Grayscale16)  # Specify
+        currRGBPixMap = self.cv2ToQPixmap(
+            renderedStereoRGB, QImage.Format_RGB888)
+        currDepthPixMap = self.cv2ToQPixmap(np.array(
+            renderedStereoDepth, dtype=np.uint16), QImage.Format_Grayscale16)  # Specify
 
         self.ui.rgbImage.setPixmap(currRGBPixMap)
         self.ui.depthImage.setPixmap(currDepthPixMap)
@@ -33,7 +37,7 @@ class VideoPageHandler:
         height, width = (currImage.shape[0], currImage.shape[1])
         return QPixmap.fromImage(QImage(currImage, width, height, imageFormat))
 
-    def setSceneVisualsData(self, newSelect = False):
+    def setSceneVisualsData(self, newSelect=False):
 
         # The images are not stored
         if not STORE_ALL_IMAGES:

@@ -6,6 +6,7 @@ from pyquaternion import Quaternion
 from PyQt5 import QtCore, QtGui, QtWidgets
 from vispy.visuals.transforms import STTransform
 
+# Handles the rendering of the camera positions
 class CameraPageHandler:
     def __init__(self, ui, dataObject):
         self.ui = ui
@@ -19,9 +20,9 @@ class CameraPageHandler:
         self.modeledCameras, self.modeledDirections = self.getRenders(
             self.data.modeledCamLocs)
 
+        # Render both in the beginning
         self.ui.renderGroundTruthCheckBox.setChecked(True)
         self.ui.renderModeledCheckBox.setChecked(True)
-
 
         self.ui.renderGroundTruthCheckBox.stateChanged.connect(
             self.setSceneVisualsData)
@@ -31,7 +32,7 @@ class CameraPageHandler:
     # Create the 3d vispy widget
     def createVispyWidget(self):
         self.canvas = scene.SceneCanvas(
-            keys='interactive', size=(600, 600), show=True, bgcolor=(28/255, 31/255, 36/255))
+            keys='interactive', size=(600, 600), show=True, bgcolor=(28 / 255, 31 / 255, 36 / 255))
         self.ui.cameraRenderPlace.layout().addWidget(self.canvas.native)
 
         self.view = self.canvas.central_widget.add_view()
@@ -42,8 +43,10 @@ class CameraPageHandler:
 
         centerOfMass = self.getCenterOfMass()
         self.view.camera.center = tuple(centerOfMass)
+        self.view.camera.scale_factor = 1.0
         self.view.camera.update()
 
+    # For rotating
     def getCenterOfMass(self):
         allPositions = [self.data.trueCamLocs[timestamp].translation
                         for timestamp in self.data.timestamps]
@@ -134,9 +137,8 @@ class CameraPageHandler:
         self.modeledLines.set_data(
             pos=currDirects, color=lineColors, connect="segments")
 
-    def setSceneVisualsData(self, newSelect = False):
+    def setSceneVisualsData(self, newSelect=False):
         self.clearScreen()
-
         amount = self.ui.end - self.ui.start
         if amount <= 1:
             return
